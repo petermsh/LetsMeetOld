@@ -1,30 +1,37 @@
 using System.Reflection;
+using AutoMapper;
 using LetsMeet.API.Database;
+using LetsMeet.API.Infrastructure;
+using LetsMeet.API.Services;
 using Microsoft.EntityFrameworkCore;
+using MapperConfiguration = LetsMeet.API.DTO.MapperConfiguration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllersWithValidations();
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwagger();
 
 builder.Services.AddDbContext<DataContext>(
     o => o.UseNpgsql(builder.Configuration.GetConnectionString("db")));
 builder.Services.AddHostedService<DbMigrator>();
-builder.Services.AddAutoMapper(Assembly.GetExecutingAssembly());
+builder.Services.AddAutoMapper(typeof(MapperConfiguration).Assembly);
+
+builder.Services.RegisterInterfaces();
+
+var authOptions = builder.Configuration.GetOptions<AuthOptions>("Auth");
+builder.Services.AddAuth(authOptions);
 
 var app = builder.Build();
+AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+
+app.UseSwaggerDocs();
 
 app.UseHttpsRedirection();
-
+app.UseAuth();
 app.UseAuthorization();
-
+app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
 
 app.Run();

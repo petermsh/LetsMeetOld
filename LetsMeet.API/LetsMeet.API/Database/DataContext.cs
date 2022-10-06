@@ -24,11 +24,11 @@ public class DataContext : DbContext
     {
         foreach (var entity in ChangeTracker.Entries().Where(p => p.State == EntityState.Added))
             if (entity.Entity is ICreatedAt created)
-                created.CreatedAt = DateTime.Now;
+                created.CreatedAt = DateTime.UtcNow;
 
         foreach (var entity in ChangeTracker.Entries().Where(p => p.State == EntityState.Modified))
             if (entity.Entity is IModifiedAt updated)
-                updated.ModifiedAt = DateTime.Now;
+                updated.ModifiedAt = DateTime.UtcNow;
     }
 
     public override int SaveChanges()

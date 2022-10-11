@@ -6,6 +6,9 @@ namespace LetsMeet.API.Database;
 public class DataContext : DbContext
 {
     public DbSet<User> Users { get; set; }
+    public DbSet<UserConnection> UserConnections { get; set; }
+    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Message> Messages { get; set; }
 
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {

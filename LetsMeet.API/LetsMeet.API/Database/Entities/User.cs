@@ -14,8 +14,10 @@ public class User : ICreatedAt, IModifiedAt
     public string? University { get; set; }
     public string? Major { get; set; }
     //profilePhoto
+    public bool Status { get; set; }
     public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
+    public ICollection<UserConnection> UserConnections { get; set; }
 }
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
@@ -24,14 +26,26 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
     {
         user.HasKey(x => x.Id);
 
-        user.Property(x => x.Nick).IsRequired();
-        
-        user.Property(x => x.Email).IsRequired();
-        
-        user.Property(x => x.Password).IsRequired();
+        user.Property(x => x.Nick)
+            .IsRequired();
+
+        user.Property(x => x.Email)
+            .IsRequired();
+
+        user.Property(x => x.Password)
+            .IsRequired();
+
+        user.Property(x => x.Status)
+            .IsRequired()
+            .HasDefaultValue(true);
+
+        user.HasMany(x => x.UserConnections)
+            .WithOne(x => x.User)
+            .HasForeignKey(x => x.UserId)
+            .OnDelete(DeleteBehavior.ClientCascade);
         
         //user.Property(x => x.City).IsRequired();
-        
+
         //user.Property(x => x.University).IsRequired();
     }
 }

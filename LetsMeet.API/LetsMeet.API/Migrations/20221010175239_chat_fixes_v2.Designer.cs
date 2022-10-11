@@ -3,6 +3,7 @@ using System;
 using LetsMeet.API.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LetsMeet.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221010175239_chat_fixes_v2")]
+    partial class chat_fixes_v2
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -99,11 +101,6 @@ namespace LetsMeet.API.Migrations
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<bool>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
-
                     b.Property<string>("University")
                         .HasColumnType("text");
 
@@ -116,6 +113,9 @@ namespace LetsMeet.API.Migrations
                 {
                     b.Property<string>("ConnectionId")
                         .HasColumnType("text");
+
+                    b.Property<bool>("Connected")
+                        .HasColumnType("boolean");
 
                     b.Property<string>("RoomId")
                         .IsRequired()

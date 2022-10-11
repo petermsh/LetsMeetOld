@@ -40,4 +40,20 @@ public class UserController : Controller
         var info = _userService.GetInfo();
         return Ok(info);
     }
+    
+    [Authorize]
+    [HttpGet("{nick}")]
+    public IActionResult GetUser(string nick)
+    {
+        var user = _userService.GetUser(nick);
+        return Ok(user);
+    }
+
+    [Authorize]
+    [HttpPost("status")]
+    public IActionResult ChangeStatus(bool status)
+    {
+        _userService.ChangeStatus(status);
+        return NoContent();
+    }
 }

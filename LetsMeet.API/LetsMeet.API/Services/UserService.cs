@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using AutoMapper.QueryableExtensions;
 using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
@@ -66,5 +67,26 @@ internal class UserService : IUserService
         var info = _mapper.Map<UserInfoDto>(user);
 
         return info;
+    }
+
+    public UserInfoDto GetUser(string nick)
+    {
+        var user = _context.Users.SingleOrDefault(x => x.Nick == nick);
+        if (user is null)
+            throw new UserNotFoundException("");
+        var userInfo = _mapper.Map<UserInfoDto>(user);
+        
+        return userInfo;
+    }
+
+    public void ChangeStatus(bool status)
+    {
+        var user = _userInfoProvider.CurrentUser;
+        if (user is null)
+            throw new UserNotFoundException("");
+        user.Status = status;
+
+        _context.Update(user);
+        _context.SaveChanges();
     }
 }

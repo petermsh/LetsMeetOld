@@ -1,6 +1,7 @@
 using System.Reflection;
 using AutoMapper;
 using LetsMeet.API.Database;
+using LetsMeet.API.Hubs;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
 using Microsoft.EntityFrameworkCore;
@@ -16,8 +17,19 @@ builder.Services.AddDbContext<DataContext>(
     o => o.UseNpgsql(builder.Configuration.GetConnectionString("db")));
 builder.Services.AddHostedService<DbMigrator>();
 builder.Services.AddAutoMapper(typeof(MapperConfiguration).Assembly);
-
+builder.Services.AddSignalR();
 builder.Services.RegisterInterfaces();
+
+builder.Services.AddCors(options =>
+{
+    options.AddDefaultPolicy(builder =>
+    {
+        builder.WithOrigins("https://letsmeet-api.azurewebsites.net/")
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowCredentials();
+    });
+});
 
 var authOptions = builder.Configuration.GetOptions<AuthOptions>("Auth");
 builder.Services.AddAuth(authOptions);
@@ -25,9 +37,10 @@ builder.Services.AddAuth(authOptions);
 var app = builder.Build();
 AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-
+app.MapHub<ChatHub>("/chat");
 app.UseSwaggerDocs();
 
+app.UseCors();
 app.UseHttpsRedirection();
 app.UseAuth();
 app.UseAuthorization();

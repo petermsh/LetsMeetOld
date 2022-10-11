@@ -1,4 +1,5 @@
-﻿using LetsMeet.API.Interfaces;
+﻿using LetsMeet.API.Hubs;
+using LetsMeet.API.Interfaces;
 using LetsMeet.API.Services;
 
 namespace LetsMeet.API.Infrastructure;
@@ -9,6 +10,7 @@ public static class InterfaceRegistry
     {
         return services
             .AddScoped<IUserService, UserService>()
+            .AddScoped<IChatService, ChatService>()
             .AddScoped<ErrorHandlingMiddleware>()
             .AddScoped<IUserInfoProvider, UserInfoProvider>()
             .AddScoped<IHashService, HashService>()

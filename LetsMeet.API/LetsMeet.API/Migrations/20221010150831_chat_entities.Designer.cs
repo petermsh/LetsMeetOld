@@ -3,6 +3,7 @@ using System;
 using LetsMeet.API.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,10 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace LetsMeet.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    partial class DataContextModelSnapshot : ModelSnapshot
+    [Migration("20221010150831_chat_entities")]
+    partial class chat_entities
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -21,36 +23,6 @@ namespace LetsMeet.API.Migrations
                 .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
-
-            modelBuilder.Entity("LetsMeet.API.Database.Entities.Message", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("integer");
-
-                    NpgsqlPropertyBuilderExtensions.UseIdentityByDefaultColumn(b.Property<int>("Id"));
-
-                    b.Property<string>("Body")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<DateTime>("DateTime")
-                        .HasColumnType("timestamp with time zone");
-
-                    b.Property<string>("RoomId")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.Property<string>("UserNick")
-                        .IsRequired()
-                        .HasColumnType("text");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomId");
-
-                    b.ToTable("Messages");
-                });
 
             modelBuilder.Entity("LetsMeet.API.Database.Entities.Room", b =>
                 {
@@ -83,7 +55,8 @@ namespace LetsMeet.API.Migrations
 
                     b.Property<string>("Email")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Major")
                         .HasColumnType("text");
@@ -93,21 +66,23 @@ namespace LetsMeet.API.Migrations
 
                     b.Property<string>("Nick")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
                     b.Property<string>("Password")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasMaxLength(128)
+                        .HasColumnType("character varying(128)");
 
-                    b.Property<bool>("Status")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("boolean")
-                        .HasDefaultValue(true);
+                    b.Property<string>("RoomId")
+                        .HasColumnType("text");
 
                     b.Property<string>("University")
                         .HasColumnType("text");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Users");
                 });
@@ -117,57 +92,40 @@ namespace LetsMeet.API.Migrations
                     b.Property<string>("ConnectionId")
                         .HasColumnType("text");
 
-                    b.Property<string>("RoomId")
+                    b.Property<bool>("Connected")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("UserAgent")
                         .IsRequired()
                         .HasColumnType("text");
 
-                    b.Property<int>("UserId")
+                    b.Property<int?>("UserId")
                         .HasColumnType("integer");
 
                     b.HasKey("ConnectionId");
-
-                    b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
 
                     b.ToTable("UserConnections");
                 });
 
-            modelBuilder.Entity("LetsMeet.API.Database.Entities.Message", b =>
+            modelBuilder.Entity("LetsMeet.API.Database.Entities.User", b =>
                 {
-                    b.HasOne("LetsMeet.API.Database.Entities.Room", "Room")
-                        .WithMany("Messages")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Room");
+                    b.HasOne("LetsMeet.API.Database.Entities.Room", null)
+                        .WithMany("Users")
+                        .HasForeignKey("RoomId");
                 });
 
             modelBuilder.Entity("LetsMeet.API.Database.Entities.UserConnection", b =>
                 {
-                    b.HasOne("LetsMeet.API.Database.Entities.Room", "Rooms")
+                    b.HasOne("LetsMeet.API.Database.Entities.User", null)
                         .WithMany("UserConnections")
-                        .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LetsMeet.API.Database.Entities.User", "User")
-                        .WithMany("UserConnections")
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.ClientCascade)
-                        .IsRequired();
-
-                    b.Navigation("Rooms");
-
-                    b.Navigation("User");
+                        .HasForeignKey("UserId");
                 });
 
             modelBuilder.Entity("LetsMeet.API.Database.Entities.Room", b =>
                 {
-                    b.Navigation("Messages");
-
-                    b.Navigation("UserConnections");
+                    b.Navigation("Users");
                 });
 
             modelBuilder.Entity("LetsMeet.API.Database.Entities.User", b =>

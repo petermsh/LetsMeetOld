@@ -52,24 +52,24 @@ public class ChatHub : Hub
     {
         var user = _userInfoProvider.CurrentUser;
 
-        var room = _dataContext.Rooms.FirstOrDefault(x => x.RoomId == roomId);
-
-        if (room is null)
-        {
-            var newRoom = new Room()
-            {
-                RoomId = roomId
-            };
-        }
-        else
-        {
-            var messages = _dataContext.Messages
-                .Where(x => x.RoomId == roomId)
-                .Select(x=>_mapper.Map<MessageListDTO>(x))
-                .OrderBy(x => x.Date)
-                .ToList();
-            await Clients.Group(roomId).SendAsync("ReceiveMessages", messages);
-        }
+        // var room = _dataContext.Rooms.FirstOrDefault(x => x.RoomId == roomId);
+        //
+        // if (room is null)
+        // {
+        //     var newRoom = new Room()
+        //     {
+        //         RoomId = roomId
+        //     };
+        // }
+        // else
+        // {
+        //     var messages = _dataContext.Messages
+        //         .Where(x => x.RoomId == roomId)
+        //         .Select(x=>_mapper.Map<MessageListDTO>(x))
+        //         .OrderBy(x => x.Date)
+        //         .ToList();
+        //     await Clients.Group(roomId).SendAsync("ReceiveMessages", messages);
+        // }
         
         await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
         var userConnection = new UserConnection()

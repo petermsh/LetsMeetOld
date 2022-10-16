@@ -14,75 +14,93 @@ public class ChatHub : Hub
     private readonly IUserInfoProvider _userInfoProvider;
     private readonly DataContext _dataContext;
     private readonly IMapper _mapper;
+    private readonly ILogger<ChatHub> _logger;
 
-    public ChatHub(DataContext dataContext, IUserInfoProvider userInfoProvider, IMapper mapper)
+    public ChatHub(DataContext dataContext, IUserInfoProvider userInfoProvider, IMapper mapper, ILogger<ChatHub> logger)
     {
         _dataContext = dataContext;
         _userInfoProvider = userInfoProvider;
         _mapper = mapper;
+        _logger = logger;
     }
     
-    public override Task OnDisconnectedAsync(Exception? exception)
+    // public override Task OnDisconnectedAsync(Exception? exception)
+    // {
+    //     var userConnection = _dataContext.UserConnections
+    //         .FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
+    //
+    //     if (userConnection is not null)
+    //     {
+    //         _dataContext.Remove(userConnection);
+    //         Clients.Group(userConnection.RoomId)
+    //             .SendAsync("ReceiveMessage", string.Empty, $"{userConnection.User.Nick} has left");
+    //     }
+    //
+    //     return base.OnDisconnectedAsync(exception);
+    // }
+
+    // public async Task SendMessage(string message)
+    // {
+    //     var userConnection = _dataContext.UserConnections
+    //         .FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
+    //
+    //     if (userConnection is not null)
+    //     {
+    //         await Clients.Group(userConnection.RoomId).SendAsync("ReceiveMessage", userConnection.User.Nick, message);
+    //     }
+    // }
+    
+    // public Task JoinRoom(string roomId)
+    // {
+    //     // var user = _userInfoProvider.CurrentUser;
+    //
+    //     // var room = _dataContext.Rooms.FirstOrDefault(x => x.RoomId == roomId);
+    //     //
+    //     // if (room is null)
+    //     // {
+    //     //     var newRoom = new Room()
+    //     //     {
+    //     //         RoomId = roomId
+    //     //     };
+    //     // }
+    //     // else
+    //     // {
+    //     //     var messages = _dataContext.Messages
+    //     //         .Where(x => x.RoomId == roomId)
+    //     //         .Select(x=>_mapper.Map<MessageListDTO>(x))
+    //     //         .OrderBy(x => x.Date)
+    //     //         .ToList();
+    //     //     await Clients.Group(roomId).SendAsync("ReceiveMessages", messages);
+    //     // }
+    //     
+    //     // await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+    //     // var userConnection = new UserConnection()
+    //     // {
+    //     //     ConnectionId = Context.ConnectionId,
+    //     //     UserId = user.Id,
+    //     //     RoomId = roomId
+    //     // };
+    //     //
+    //     // _dataContext.UserConnections.Add(userConnection);
+    //     // _dataContext.SaveChanges();
+    //     //
+    //     // await Clients.Group(roomId).SendAsync("ReceiveMessage", string.Empty, $"{userConnection.User.Nick} has joined");
+    //
+    //     return Groups.AddToGroupAsync(Context.ConnectionId, roomId);
+    // }
+    
+    public void JoinGroup(string groupName)
     {
-        var userConnection = _dataContext.UserConnections
-            .FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
-
-        if (userConnection is not null)
-        {
-            _dataContext.Remove(userConnection);
-            Clients.Group(userConnection.RoomId)
-                .SendAsync("ReceiveMessage", string.Empty, $"{userConnection.User.Nick} has left");
-        }
-
-        return base.OnDisconnectedAsync(exception);
-    }
-
-    public async Task SendMessage(string message)
-    {
-        var userConnection = _dataContext.UserConnections
-            .FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
-
-        if (userConnection is not null)
-        {
-            await Clients.Group(userConnection.RoomId).SendAsync("ReceiveMessage", userConnection.User.Nick, message);
-        }
-    }
-
-    public async Task JoinRoom(string roomId)
-    {
-        var user = _userInfoProvider.CurrentUser;
-
-        // var room = _dataContext.Rooms.FirstOrDefault(x => x.RoomId == roomId);
-        //
-        // if (room is null)
-        // {
-        //     var newRoom = new Room()
-        //     {
-        //         RoomId = roomId
-        //     };
-        // }
-        // else
-        // {
-        //     var messages = _dataContext.Messages
-        //         .Where(x => x.RoomId == roomId)
-        //         .Select(x=>_mapper.Map<MessageListDTO>(x))
-        //         .OrderBy(x => x.Date)
-        //         .ToList();
-        //     await Clients.Group(roomId).SendAsync("ReceiveMessages", messages);
-        // }
+        _logger.LogInformation("JoinGroup executing...");
         
-        await Groups.AddToGroupAsync(Context.ConnectionId, roomId);
-        var userConnection = new UserConnection()
-        {
-            ConnectionId = Context.ConnectionId,
-            UserId = user.Id,
-            RoomId = roomId
-        };
+        this.Groups.AddToGroupAsync(this.Context.ConnectionId, groupName);
+    }
 
-        _dataContext.UserConnections.Add(userConnection);
-        _dataContext.SaveChanges();
-
-        await Clients.Group(roomId).SendAsync("ReceiveMessage", string.Empty, $"{userConnection.User.Nick} has joined");
+    public async Task LeaveRoom(string roomId)
+    {
+        _logger.LogInformation("LeaveGroup executing...");
+        
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
     }
 
 }

@@ -1,13 +1,23 @@
 using System.Reflection;
+using System.Security.Cryptography;
 using AutoMapper;
 using LetsMeet.API.Database;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
+using Microsoft.AspNetCore;
 using Microsoft.EntityFrameworkCore;
 using MapperConfiguration = LetsMeet.API.DTO.MapperConfiguration;
+using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
+
+var logger = new LoggerConfiguration()
+    .ReadFrom.Configuration(builder.Configuration)
+    .Enrich.FromLogContext()
+    .CreateLogger();
+builder.Logging.ClearProviders();
+builder.Logging.AddSerilog(logger);
 
 builder.Services.AddEntityFrameworkSqlServer();
 builder.Services.AddControllersWithValidations();
@@ -19,7 +29,10 @@ builder.Services.AddSwagger();
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("db")));
 builder.Services.AddHostedService<DbMigrator>();
 builder.Services.AddAutoMapper(typeof(MapperConfiguration).Assembly);
-builder.Services.AddSignalR();
+builder.Services.AddSignalR(options =>
+{
+    options.EnableDetailedErrors = true;
+});
 builder.Services.RegisterInterfaces();
 
 builder.Services.AddCors(options =>
@@ -32,6 +45,7 @@ builder.Services.AddCors(options =>
             .AllowCredentials();
     });
 });
+
 
 var authOptions = builder.Configuration.GetOptions<AuthOptions>("Auth");
 builder.Services.AddAuth(authOptions);
@@ -48,7 +62,5 @@ app.UseAuth();
 app.UseAuthorization();
 app.UseMiddleware<ErrorHandlingMiddleware>();
 app.MapControllers();
-
-
 
 app.Run();

@@ -1,6 +1,8 @@
-﻿namespace LetsMeet.API.Interfaces;
+﻿using LetsMeet.API.DTO;
+
+namespace LetsMeet.API.Interfaces;
 
 public interface IChatService
 {
-    public string DrawUser();
+    public FindUserDto DrawUser();
 }

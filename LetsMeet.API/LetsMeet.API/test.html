@@ -1,0 +1,44 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
+<script>
+    let connection = new signalR.HubConnectionBuilder()
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "b12df13e-aef2-44a7-99c5-6e2d84a29596"})
+        .configureLogging(signalR.LogLevel.Information)
+        .build();
+
+    const _connect = () => connection.start();
+
+    connection.on('ReceiveMessage', (message) =>{
+        console.log(message)
+    })
+
+
+    const _join = async (room) => connection.invoke('JoinRoom', {roomId: room})
+        .then(() => {
+            console.log('git')
+        })
+        .catch(error=>{
+            console.log("fuck", error)
+        })
+
+	const _leave = async (room) => connection.invoke('LeaveRoom', {roomId: room})
+        .then(() => {
+            console.log('elo')
+        })
+        .catch(error=>{
+            console.log("fuck", error)
+        })
+
+    const _send = (message, roomId) => connection.invoke("SendMessage", {roomId: roomId, Body: message});
+
+
+
+</script>
+</body>
+</html>

@@ -7,3 +7,9 @@ public class MessageListDTO
     public DateTime Date { get; set; }
     public bool FromUser { get; set; }
 }
+
+public class LastMessageDto
+{
+    public string Body { get; set; }
+    public DateTime Date { get; set; }
+}

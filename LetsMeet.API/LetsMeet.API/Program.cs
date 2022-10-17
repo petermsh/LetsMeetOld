@@ -6,16 +6,19 @@ using LetsMeet.API.Hubs;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
 using Microsoft.AspNetCore;
+using Microsoft.AspNetCore.Http.Connections;
 using Microsoft.EntityFrameworkCore;
 using MapperConfiguration = LetsMeet.API.DTO.MapperConfiguration;
 using Serilog;
 
 var builder = WebApplication.CreateBuilder(args);
 
+
 var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
+
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
 
@@ -37,26 +40,28 @@ builder.Services.RegisterInterfaces();
 
 builder.Services.AddCors(options =>
 {
-    options.AddDefaultPolicy(builder =>
-    {
-        builder.WithOrigins("https://letsmeet-api.azurewebsites.net/")
+    options.AddPolicy("CorsPolicy", builder =>
+            builder.WithOrigins("https://localhost:7168")
             .AllowAnyHeader()
             .AllowAnyMethod()
-            .AllowCredentials();
-    });
+            .AllowCredentials()
+            .SetIsOriginAllowed((host) => true));
 });
-
 
 var authOptions = builder.Configuration.GetOptions<AuthOptions>("Auth");
 builder.Services.AddAuth(authOptions);
 
 var app = builder.Build();
-AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
-app.MapHub<ChatHub>("/chatter");
+app.MapHub<ChatHub>("/chatter", options =>
+{
+    options.Transports =
+        HttpTransportType.WebSockets |
+        HttpTransportType.LongPolling;
+});
 app.UseSwaggerDocs();
 
-app.UseCors();
+app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseAuth();
 app.UseAuthorization();

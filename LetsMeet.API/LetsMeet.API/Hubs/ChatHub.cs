@@ -4,6 +4,7 @@ using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
 using LetsMeet.API.Interfaces;
+using Microsoft.AspNetCore.Cors;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.SignalR;
 
@@ -39,16 +40,10 @@ public class ChatHub : Hub
     //     return base.OnDisconnectedAsync(exception);
     // }
 
-    // public async Task SendMessage(string message)
-    // {
-    //     var userConnection = _dataContext.UserConnections
-    //         .FirstOrDefault(c => c.ConnectionId == Context.ConnectionId);
-    //
-    //     if (userConnection is not null)
-    //     {
-    //         await Clients.Group(userConnection.RoomId).SendAsync("ReceiveMessage", userConnection.User.Nick, message);
-    //     }
-    // }
+    public async Task SendMessage(Message message)
+    {
+        await Clients.Group(message.RoomId).SendAsync("ReceiveMessage", message.Body);
+    }
     
     // public Task JoinRoom(string roomId)
     // {
@@ -88,19 +83,27 @@ public class ChatHub : Hub
     //
     //     return Groups.AddToGroupAsync(Context.ConnectionId, roomId);
     // }
-    
-    public void JoinGroup(string groupName)
+    public async Task JoinRoom(Room room)
     {
         _logger.LogInformation("JoinGroup executing...");
         
-        this.Groups.AddToGroupAsync(this.Context.ConnectionId, groupName);
+        
+        // var messages = _dataContext.Messages
+        //     .Where(x => x.RoomId == room.RoomId)
+        //     .Select(x=>_mapper.Map<MessageListDTO>(x))
+        //     .ToList();
+        // await Clients.Group(room.RoomId).SendAsync("ReceiveMessages", messages);
+        
+        await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
+
+        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"User has joined");
     }
 
-    public async Task LeaveRoom(string roomId)
+    public async Task LeaveRoom(Room room)
     {
         _logger.LogInformation("LeaveGroup executing...");
         
-        await Groups.RemoveFromGroupAsync(Context.ConnectionId, roomId);
+        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"User has left");
     }
 
 }

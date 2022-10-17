@@ -39,6 +39,8 @@ public class UserController : Controller
     [HttpGet]
     public IActionResult GetInfo()
     {
+        _logger.LogInformation("GetInfo executed..");
+        
         var info = _userService.GetInfo();
         return Ok(info);
     }

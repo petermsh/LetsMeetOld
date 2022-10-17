@@ -1,5 +1,6 @@
 ﻿using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
+using LetsMeet.API.DTO;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -27,9 +28,11 @@ public class ChatController : Controller
     [Route("find")]
     [HttpGet]
     [Authorize]
-    public string DrawUser()
+    public FindUserDto DrawUser()
     {
         return _chatService.DrawUser();
     }
+    
+
 
 }

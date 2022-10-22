@@ -54,6 +54,16 @@ public class UserController : Controller
     }
 
     [Authorize]
+    [HttpPatch("update")]
+    [ProducesResponseType(StatusCodes.Status204NoContent)]
+    public IActionResult UpdateInfo([FromBody] UserEditDto userEditDto)
+    {
+        _userService.UpdateInfo(userEditDto);
+        return NoContent();
+    }
+    
+
+    [Authorize]
     [HttpPost("status")]
     public IActionResult ChangeStatus(bool status)
     {

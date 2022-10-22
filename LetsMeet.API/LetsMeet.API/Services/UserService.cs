@@ -79,6 +79,18 @@ internal class UserService : IUserService
         return userInfo;
     }
 
+    public void UpdateInfo(UserEditDto dto)
+    {
+        var user = _userInfoProvider.CurrentUser;
+        if (user is null)
+            throw new UserNotFoundException("");
+
+        user = _mapper.Map(dto, user);
+
+        _context.Users.Update(user);
+        _context.SaveChanges();
+    }
+
     public void ChangeStatus(bool status)
     {
         var user = _userInfoProvider.CurrentUser;

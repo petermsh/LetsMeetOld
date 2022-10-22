@@ -8,5 +8,6 @@ public interface IUserService
     string Login(UserLoginDto dto);
     UserInfoDto GetInfo();
     UserInfoDto GetUser(string nick);
+    void UpdateInfo(UserEditDto dto);
     void ChangeStatus(bool status);
 }

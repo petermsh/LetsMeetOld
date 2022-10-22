@@ -9,9 +9,10 @@ public class UserRegDto
     public string Nick { get; set; }
     public string Password { get; set; }
     public string ReapetedPassword { get; set; }
-    public string Bio { get; set; }
+    public string? Bio { get; set; }
     public string City { get; set; }
-    public string University { get; set; }
+    public string? University { get; set; }
+    public string? Major { get; set; }
 }
 
 public class UserLoginDto
@@ -26,6 +27,7 @@ public class UserInfoDto
     public string Bio { get; set; }
     public string City { get; set; }
     public string University { get; set; }
+    public string Major { get; set; }
 }
 
 public class FindUserDto
@@ -34,6 +36,14 @@ public class FindUserDto
     public LastMessageDto LastMessage { get; set; }
     public string RoomId { get; set; }
     public DateTime CreatedDateTime { get; set; }
+}
+
+public class UserEditDto
+{
+    public string? Nick { get; set; }
+    public string? Bio { get; set; }
+    public string? City { get; set; }
+    public string? University { get; set; }
 }
 
 public class UserRegDtoValidator : AbstractValidator<UserRegDto>

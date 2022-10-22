@@ -36,6 +36,11 @@ internal class UserService : IUserService
         {
             throw new UserNameAlreadyExistException(userRegDto.Nick);
         }
+
+        if (!userRegDto.Password.Equals(userRegDto.ReapetedPassword))
+        {
+            throw new UserWrongRepeatedPasswordException();
+        }
         
         var user = _mapper.Map<User>(userRegDto);
         user.Password = _hashService.Hash(userRegDto.Password);

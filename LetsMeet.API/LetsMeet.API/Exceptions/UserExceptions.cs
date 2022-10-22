@@ -12,6 +12,11 @@ public class UserWrongPasswordException : ProjectException
     public UserWrongPasswordException() : base($"Wprowadzone hasło jest nieprawidłowe.") { }
 }
 
+public class UserWrongRepeatedPasswordException : ProjectException
+{
+    public UserWrongRepeatedPasswordException() : base("Wprowadzone hasla nie są zgodne.") { }
+}
+
 public class UserEmailAlreadyExistException : ProjectException
 {
     public UserEmailAlreadyExistException(string email) : base($"Konto o adresie mailowym {email} już istnieje.") { }

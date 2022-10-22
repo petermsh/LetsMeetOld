@@ -40,10 +40,18 @@ public class FindUserDto
 
 public class UserEditDto
 {
-    public string? Nick { get; set; }
-    public string? Bio { get; set; }
-    public string? City { get; set; }
-    public string? University { get; set; }
+    public string Nick { get; set; }
+    public string Bio { get; set; }
+    public string City { get; set; }
+    public string University { get; set; }
+}
+
+public class UserEditDtoValidator : AbstractValidator<UserEditDto>
+{
+    public UserEditDtoValidator()
+    {
+        RuleFor(user => user.Bio).MaximumLength(512);
+    }
 }
 
 public class UserRegDtoValidator : AbstractValidator<UserRegDto>

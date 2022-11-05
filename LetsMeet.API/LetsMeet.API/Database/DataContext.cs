@@ -1,14 +1,15 @@
 ﻿using LetsMeet.API.Database.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace LetsMeet.API.Database;
 
-public class DataContext : DbContext
+public class DataContext : IdentityDbContext<User>
 {
-    public DbSet<User> Users { get; set; }
-    public DbSet<UserConnection> UserConnections { get; set; }
-    public DbSet<Room> Rooms { get; set; }
     public DbSet<Message> Messages { get; set; }
+    public DbSet<Group> Groups { get; set; }
+    public DbSet<Connection> Connections { get; set; }
 
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {

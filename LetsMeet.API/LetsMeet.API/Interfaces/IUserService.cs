@@ -1,13 +1,15 @@
-﻿using LetsMeet.API.DTO;
+﻿using LetsMeet.API.Database.Entities;
+using LetsMeet.API.DTO;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
 
 namespace LetsMeet.API.Interfaces;
 
 public interface IUserService
 {
-    void CreateUser(UserRegDto userRegDto);
-    string Login(UserLoginDto dto);
-    UserInfoDto GetInfo();
-    UserInfoDto GetUser(string nick);
-    void UpdateInfo(UserEditDto dto);
-    void ChangeStatus(bool status);
+    
+    void Update(User user);
+    Task<IEnumerable<User>> GetUsers();
+    Task<User> GetUserByIdAsync(int id);
+    Task<User> GetUserByUsernameAsync(string username);
 }

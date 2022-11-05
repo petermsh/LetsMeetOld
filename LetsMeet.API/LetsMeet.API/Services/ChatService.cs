@@ -16,42 +16,28 @@ public class ChatService : IChatService
         _userInfoProvider = userInfoProvider;
     }
     
-    public FindUserDto DrawUser()
+    public string? DrawUser()
     {
-        Random rng = new Random();
-        var users = _dataContext.Users
-            .Where(x => x.Status == true && x.Id != _userInfoProvider.CurrentUser.Id)
-            .ToList();
-        var randUser = rng.Next(users.Count()) + 1;
-        var user = users.Single(u => u.Id == randUser);
+        // Random rng = new Random();
+        // var users = _dataContext
+        //     .Users.ToList();
+        // var randUser = rng.Next(users.Count()) + 1;
+        // var user = users
+        //     .Where(x=>x.Id==randUser)
+        //     .ToString();
 
-        var room = new Room() {};
-        _dataContext.Rooms.Add(room);
-        _dataContext.SaveChanges();
+        // var room = new Room() {};
+        // _dataContext.Rooms.Add(room);
+        // _dataContext.SaveChanges();
         
-        var firstConnection = new UserConnection()
-        {
-            UserId = _userInfoProvider.CurrentUser.Id,
-            RoomId = room.RoomId,
-        };
-
-        var secondConnection = new UserConnection()
-        {
-            UserId = user.Id,
-            RoomId = room.RoomId
-        };
         
-        _dataContext.UserConnections.Add(firstConnection);
-        _dataContext.UserConnections.Add(secondConnection);
-        _dataContext.SaveChanges();
-
-        var findUser = new FindUserDto()
-        {
-            Nick = user.Nick,
-            RoomId = room.RoomId,
-            CreatedDateTime = room.CreatedAt,
-        };
+        // var findUser = new FindUserDto()
+        // {
+        //     Nick = user.Nick,
+        //     RoomId = room.RoomId,
+        //     CreatedDateTime = room.CreatedAt,
+        // };
         
-        return findUser;
+        return "g";
     }
 }

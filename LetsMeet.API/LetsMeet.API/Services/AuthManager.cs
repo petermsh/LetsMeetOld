@@ -36,7 +36,7 @@ public sealed class AuthManager : IAuthManager
         var securityKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_options.Key));
         var credentials = new SigningCredentials(securityKey, SecurityAlgorithms.HmacSha256);
 
-        var claims = new List<Claim> { new("id", user.Id.ToString()), new("name", user.Nick) };
+        var claims = new List<Claim> { new("id", user.Id.ToString()), new("name", user.UserName) };
         var expires = DateTime.Now.Add(_options.Expiry);
 
         var token = new JwtSecurityToken(_issuer,

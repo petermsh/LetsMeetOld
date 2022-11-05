@@ -13,11 +13,11 @@ namespace LetsMeet.API.Controllers;
 public class ChatController : Controller
 {
     private readonly DataContext _dataContext;
-    private readonly IHubContext<ChatHub> _hubContext;
+    private readonly Hub<ChatHub> _hubContext;
     private readonly IChatService _chatService;
     private readonly IUserInfoProvider _userInfoProvider;
 
-    public ChatController(IHubContext<ChatHub> hubContext, DataContext dataContext, IChatService chatService, IUserInfoProvider userInfoProvider)
+    public ChatController(Hub<ChatHub> hubContext, DataContext dataContext, IChatService chatService, IUserInfoProvider userInfoProvider)
     {
         _hubContext = hubContext;
         _dataContext = dataContext;
@@ -28,9 +28,10 @@ public class ChatController : Controller
     [Route("find")]
     [HttpGet]
     [Authorize]
-    public FindUserDto DrawUser()
+    public string? DrawUser()
     {
-        return _chatService.DrawUser();
+        //return _chatService.DrawUser();
+        return _userInfoProvider.Name;
     }
     
 

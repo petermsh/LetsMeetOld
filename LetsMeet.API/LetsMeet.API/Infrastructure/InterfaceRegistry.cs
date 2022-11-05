@@ -1,6 +1,8 @@
-﻿using LetsMeet.API.Hubs;
+﻿using LetsMeet.API.Database;
+using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
 using LetsMeet.API.Services;
+using Microsoft.AspNetCore.SignalR;
 
 namespace LetsMeet.API.Infrastructure;
 
@@ -11,10 +13,14 @@ public static class InterfaceRegistry
         return services
             .AddScoped<IUserService, UserService>()
             .AddScoped<IChatService, ChatService>()
+            .AddScoped<IUnitOfWork, UnitOfWork>()
+            .AddScoped<IMessageService, MessageService>()
             .AddScoped<ErrorHandlingMiddleware>()
             .AddScoped<IUserInfoProvider, UserInfoProvider>()
-            .AddScoped<IHashService, HashService>()
+            .AddSingleton<PresenceTracker>()
             .AddSingleton<IAuthManager, AuthManager>()
+            .AddSingleton<ChatRegistry>()
+            .AddSingleton<IUserIdProvider, UserIdProvider>()
             .AddSingleton<IHttpContextAccessor, HttpContextAccessor>();;
     }
     

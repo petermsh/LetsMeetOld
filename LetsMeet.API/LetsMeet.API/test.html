@@ -8,15 +8,33 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "b12df13e-aef2-44a7-99c5-6e2d84a29596"})
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU2N2VkZGE4LTA1ZWEtNDE1ZS1hZDI5LTQ1YjRiNzZkYTZkYiIsIm5hbWUiOiJwam90ZXIiLCJleHAiOjE2Njk3NDMyMTksImlzcyI6IkQzOTc1MkY3LTlEMzEtNEM5Ny1CREMzLUMyQUJCRDJDQkE4NSIsImF1ZCI6IkQzOTc1MkY3LTlEMzEtNEM5Ny1CREMzLUMyQUJCRDJDQkE4NSJ9.gi2WK9DiYY7Y8BKS0xQBtRVw8R4lINTbpafhH9uIzbo"})
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
     const _connect = () => connection.start();
+    const _disconnect = () => connection.stop();
 
-    connection.on('ReceiveMessage', (message) =>{
+    connection.on('UserIsOnline', (message) =>{
         console.log(message)
     })
+    
+    connection.on('GetOnlineUsers', (lUsers) => {
+        console.log(lUsers)
+    })
+    
+    connection.on('GetUserId', (userId) => {s
+        console.log(userId)
+    })
+    connection.on('msg', (connid) => {
+		console.log(connid)
+    })
+	
+    const _users = () => connection.invoke('ConnectedUsers');
+
+    const _userId = () => connection.invoke('DrawUser');
+	
+	const _connid = () => connection.invoke('GetInfo');
 
 
     const _join = async (room) => connection.invoke('JoinRoom', {roomId: room})
@@ -35,7 +53,7 @@
             console.log("fuck", error)
         })
 
-    const _send = (message, roomId) => connection.invoke("SendMessage", {roomId: roomId, Body: message});
+    const _send = (message) => connection.invoke("SendMessage", {Body: message});
 
 
 

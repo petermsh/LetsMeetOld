@@ -15,6 +15,12 @@ public class UserRegDto
     public string? Major { get; set; }
 }
 
+public class UserReturnDto
+{
+    public string Nick { get; set; }
+    public string Token { get; set; }
+}
+
 public class UserLoginDto
 {
     public string Login { get; set; }
@@ -23,7 +29,7 @@ public class UserLoginDto
 
 public class UserInfoDto
 {
-    public string Nick { get; set; }
+    public string UserName { get; set; }
     public string Bio { get; set; }
     public string City { get; set; }
     public string University { get; set; }

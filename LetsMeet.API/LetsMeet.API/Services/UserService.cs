@@ -4,106 +4,117 @@ using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
 using LetsMeet.API.Exceptions;
+using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace LetsMeet.API.Services;
 
 internal class UserService : IUserService
 {
-    private readonly DataContext _context;
+    private readonly DataContext _dataContext;
+    private readonly UserManager<User> _userManager;
+    private readonly SignInManager<User> _signInManager;
     private readonly IAuthManager _authManager;
-    private readonly IMapper _mapper;
-    private readonly IHashService _hashService;
     private readonly IUserInfoProvider _userInfoProvider;
 
-    public UserService(DataContext context, IMapper mapper, IHashService hashService, IAuthManager authManager, IUserInfoProvider userInfoProvider)
+    public UserService(DataContext dataContext, UserManager<User> userManager, SignInManager<User> signInManager, IAuthManager authManager, IUserInfoProvider userInfoProvider)
     {
-        _context = context;
-        _mapper = mapper;
-        _hashService = hashService;
+        _dataContext = dataContext;
+        _userManager = userManager;
+        _signInManager = signInManager;
         _authManager = authManager;
         _userInfoProvider = userInfoProvider;
     }
-    
-    public void CreateUser(UserRegDto userRegDto)
+
+    public async Task<UserReturnDto> Register(UserRegDto userRegDto)
     {
-        if (_context.Users.Any(x => x.Email == userRegDto.Email))
+        if (await UserNameExists(userRegDto.Nick))
+        {
+            throw new UserNameAlreadyExistException(userRegDto.Nick);
+        }
+        
+        if (await UserEmailExists(userRegDto.Email))
         {
             throw new UserEmailAlreadyExistException(userRegDto.Email);
         }
 
-        if (_context.Users.Any(x => x.Nick == userRegDto.Nick))
+        var user = new User
         {
-            throw new UserNameAlreadyExistException(userRegDto.Nick);
+            UserName = userRegDto.Nick,
+            Email = userRegDto.Email,
+            Bio = userRegDto.Bio,
+            City = userRegDto.City,
+            University = userRegDto.University,
+            Major = userRegDto.Major,
+        };
+        var register = await _userManager.CreateAsync(user, userRegDto.Password);
+        if (!register.Succeeded)
+        {
+            throw new Exception("Rejestracja nie powiodla sie");
         }
 
-        if (!userRegDto.Password.Equals(userRegDto.ReapetedPassword))
+        return new UserReturnDto
         {
-            throw new UserWrongRepeatedPasswordException();
-        }
-        
-        var user = _mapper.Map<User>(userRegDto);
-        user.Password = _hashService.Hash(userRegDto.Password);
-        
-        _context.Users.Add(user);
-        _context.SaveChanges();
+            Nick = user.UserName,
+            Token = _authManager.CreateToken(user)
+        };
     }
-    
-    public string Login(UserLoginDto dto)
+
+    public async Task<UserReturnDto> Login(UserLoginDto userLoginDto)
     {
-        var user = _context.Users.FirstOrDefault(x => x.Nick == dto.Login || x.Email == dto.Login);
-
+        var user = await _userManager.Users
+            .SingleOrDefaultAsync(x => x.UserName == userLoginDto.Login);
+        
         if (user is null)
-            throw new UserNotFoundException(dto.Login);
+        {
+            throw new UserNotFoundException(userLoginDto.Login);
+        }
 
-        if (!_hashService.Check(user.Password, dto.Password))
-            throw new UserWrongPasswordException();
+        var login = await _signInManager.CheckPasswordSignInAsync(user, userLoginDto.Password, false);
 
-        var token = _authManager.CreateToken(user);
-        return token;
+        if (!login.Succeeded)
+        {
+            throw new UnauthorizedAccessException();
+        }
+
+        return new UserReturnDto
+        {
+            Nick = user.UserName,
+            Token = _authManager.CreateToken(user)
+        };
     }
-    
+
     public UserInfoDto GetInfo()
     {
-        var user = _userInfoProvider.CurrentUser;
+        var user = _dataContext.Users.SingleOrDefault(x => x.UserName == _userInfoProvider.Name);
         if (user is null)
+        {
             throw new UserNotFoundException("");
+        }
 
-        var info = _mapper.Map<UserInfoDto>(user);
+        var info = new UserInfoDto
+        {
+            UserName = user.UserName,
+            Bio = user.Bio,
+            City = user.City,
+            Major = user.Major,
+            University = user.University
+        };
 
         return info;
     }
 
-    public UserInfoDto GetUser(string nick)
+    private async Task<bool> UserNameExists(string username)
     {
-        var user = _context.Users.SingleOrDefault(x => x.Nick == nick);
-        if (user is null)
-            throw new UserNotFoundException("");
-        var userInfo = _mapper.Map<UserInfoDto>(user);
-        
-        return userInfo;
+        return await _userManager.Users.AnyAsync(x => x.UserName == username);
     }
-
-    public void UpdateInfo(UserEditDto dto)
+    
+    private async Task<bool> UserEmailExists(string email)
     {
-        var user = _userInfoProvider.CurrentUser;
-        if (user is null)
-            throw new UserNotFoundException("");
-
-        user = _mapper.Map(dto, user);
-
-        _context.Users.Update(user);
-        _context.SaveChanges();
-    }
-
-    public void ChangeStatus(bool status)
-    {
-        var user = _userInfoProvider.CurrentUser;
-        if (user is null)
-            throw new UserNotFoundException("");
-        user.Status = status;
-
-        _context.Update(user);
-        _context.SaveChanges();
+        return await _userManager.Users.AnyAsync(x => x.Email == email);
     }
 }

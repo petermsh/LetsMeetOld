@@ -2,11 +2,13 @@ using System.Reflection;
 using System.Security.Cryptography;
 using AutoMapper;
 using LetsMeet.API.Database;
+using LetsMeet.API.Database.Entities;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
 using Microsoft.AspNetCore;
 using Microsoft.AspNetCore.Http.Connections;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using MapperConfiguration = LetsMeet.API.DTO.MapperConfiguration;
 using Serilog;
@@ -18,6 +20,7 @@ var logger = new LoggerConfiguration()
     .ReadFrom.Configuration(builder.Configuration)
     .Enrich.FromLogContext()
     .CreateLogger();
+
 
 builder.Logging.ClearProviders();
 builder.Logging.AddSerilog(logger);
@@ -37,7 +40,8 @@ builder.Services.AddSignalR(options =>
     options.EnableDetailedErrors = true;
 });
 builder.Services.RegisterInterfaces();
-
+builder.Services.AddIdentity<User, IdentityRole>()
+    .AddEntityFrameworkStores<DataContext>();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
@@ -53,14 +57,10 @@ builder.Services.AddAuth(authOptions);
 
 var app = builder.Build();
 
-app.MapHub<ChatHub>("/chatter", options =>
-{
-    options.Transports =
-        HttpTransportType.WebSockets |
-        HttpTransportType.LongPolling;
-});
+app.MapHub<ChatHub>("/chatter");
+app.MapDefaultControllerRoute();
 app.UseSwaggerDocs();
-
+app.UseAuthentication();
 app.UseCors("CorsPolicy");
 app.UseHttpsRedirection();
 app.UseAuth();

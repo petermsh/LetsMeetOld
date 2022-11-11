@@ -9,30 +9,23 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace LetsMeet.API.Controllers;
 
+[ApiController]
 [Route("api/chat")]
+[Authorize]
 public class ChatController : Controller
 {
-    private readonly DataContext _dataContext;
-    private readonly IHubContext<ChatHub> _hubContext;
     private readonly IChatService _chatService;
-    private readonly IUserInfoProvider _userInfoProvider;
 
-    public ChatController(IHubContext<ChatHub> hubContext, DataContext dataContext, IChatService chatService, IUserInfoProvider userInfoProvider)
+    public ChatController(IChatService chatService)
     {
-        _hubContext = hubContext;
-        _dataContext = dataContext;
         _chatService = chatService;
-        _userInfoProvider = userInfoProvider;
-    }
-
-    [Route("find")]
-    [HttpGet]
-    [Authorize]
-    public FindUserDto DrawUser()
-    {
-        return _chatService.DrawUser();
     }
     
-
+    [HttpGet("draw")]
+    public IActionResult DrawUser()
+    {
+        var userName = _chatService.DrawUser();
+        return Ok(userName);
+    }
 
 }

@@ -8,16 +8,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "b12df13e-aef2-44a7-99c5-6e2d84a29596"})
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFlNzIwN2YwLTI0ODItNGE3Yy04OTUyLWZmZTg1OWFiMTVkNCIsIm5hbWUiOiJKb2huIiwiZXhwIjoxNjY5ODIyMjM4LCJpc3MiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUiLCJhdWQiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUifQ.x_5qL9Ko1wc4WU7bDCUR3JmNwMvGcL2cRpKJGKbaDaY"})
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
     const _connect = () => connection.start();
-
-    connection.on('ReceiveMessage', (message) =>{
-        console.log(message)
+    const _disconnect = () => connection.stop();
+    
+    connection.on('ReceiveMessage', (connid) => {
+		console.log(connid)
     })
 
+
+    const _create = async (user) => connection.invoke('CreateRoom', {Id: user})
+        .then(() => {
+            console.log('git')
+        })
+        .catch(error=>{
+            console.log("fuck", error)
+        })
 
     const _join = async (room) => connection.invoke('JoinRoom', {roomId: room})
         .then(() => {
@@ -35,7 +44,7 @@
             console.log("fuck", error)
         })
 
-    const _send = (message, roomId) => connection.invoke("SendMessage", {roomId: roomId, Body: message});
+    const _send = (room) => connection.invoke("SendMessage", {roomId: room});
 
 
 

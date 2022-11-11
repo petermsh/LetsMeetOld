@@ -7,9 +7,7 @@ namespace LetsMeet.API.Interfaces;
 
 public interface IUserService
 {
-    
-    void Update(User user);
-    Task<IEnumerable<User>> GetUsers();
-    Task<User> GetUserByIdAsync(int id);
-    Task<User> GetUserByUsernameAsync(string username);
+    Task<UserReturnDto> Register(UserRegDto userRegDto);
+    Task<UserReturnDto> Login(UserLoginDto userRegDto);
+    UserInfoDto GetInfo();
 }

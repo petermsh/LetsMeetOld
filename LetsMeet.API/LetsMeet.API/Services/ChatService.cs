@@ -16,28 +16,20 @@ public class ChatService : IChatService
         _userInfoProvider = userInfoProvider;
     }
     
-    public string? DrawUser()
+    public DrawUserDto DrawUser()
     {
-        // Random rng = new Random();
-        // var users = _dataContext
-        //     .Users.ToList();
-        // var randUser = rng.Next(users.Count()) + 1;
-        // var user = users
-        //     .Where(x=>x.Id==randUser)
-        //     .ToString();
-
-        // var room = new Room() {};
-        // _dataContext.Rooms.Add(room);
-        // _dataContext.SaveChanges();
+         Random rng = new Random();
+         var users = _dataContext
+              .Users
+              .Where(x=>x.Id != _userInfoProvider.Id && x.Status == true).ToList();
+         var randUser = rng.Next(users.Count());
+         var user = users[randUser];
+         var drawUser = new DrawUserDto
+         {
+             Id = user.Id,
+             Nick = user.UserName
+         };
         
-        
-        // var findUser = new FindUserDto()
-        // {
-        //     Nick = user.Nick,
-        //     RoomId = room.RoomId,
-        //     CreatedDateTime = room.CreatedAt,
-        // };
-        
-        return "g";
+        return drawUser;
     }
 }

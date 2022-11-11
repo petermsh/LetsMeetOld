@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.Interfaces;
+using LetsMeet.API.Migrations;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LetsMeet.API.Services;
@@ -19,7 +20,7 @@ internal class UserInfoProvider : IUserInfoProvider
     }
     
     public bool IsLogged => _httpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated ?? false;
-    public int? Id => _id is not null && int.TryParse(_id, out var parsedId) ? parsedId : null;
+    public string? Id => Claims.FirstOrDefault(x => x.Type == "id")?.Value;
     public User CurrentUser => Id is not null
         ? _context.Users.Find(Id)
         : null;
@@ -32,5 +33,4 @@ internal class UserInfoProvider : IUserInfoProvider
     }
 
     private IEnumerable<Claim> Claims => _httpContextAccessor?.HttpContext?.User?.Claims;
-    private string _id => Claims.FirstOrDefault(x => x.Type == "id")?.Value;
 }

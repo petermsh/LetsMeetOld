@@ -57,7 +57,6 @@ builder.Services.AddAuth(authOptions);
 
 var app = builder.Build();
 
-app.MapHub<PresenceHub>("hubs/presence");
 app.MapHub<ChatHub>("/chatter");
 app.MapDefaultControllerRoute();
 app.UseSwaggerDocs();

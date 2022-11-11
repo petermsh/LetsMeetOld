@@ -21,134 +21,98 @@ namespace LetsMeet.API.Hubs;
 [Authorize]
 public class ChatHub : Hub
 {
-    private readonly IMapper _mapper;
-    private readonly IMessageService _messageService;
-    private readonly IUnitOfWork _unitOfWork;
-    private readonly IUserService _userService;
-    private readonly PresenceTracker _tracker;
-    private readonly IHubContext<PresenceHub> _presenceHub;
-    private readonly IUserIdProvider _userIdProvider;
-
-    public ChatHub(DataContext dataContext, IUserInfoProvider userInfoProvider, IMapper mapper, ILogger<ChatHub> logger, IHttpContextAccessor httpContextAccessor, UserManager<User> userManager, IUserService userService, ChatRegistry chatRegistry, IMessageService messageService, IUnitOfWork unitOfWork, PresenceTracker tracker, IHubContext<PresenceHub> presenceHub, IUserIdProvider userIdProvider)
+    private readonly UserManager<User> _userManager;
+    private readonly DataContext _dataContext;
+    private readonly IUserInfoProvider _userInfoProvider;
+    public ChatHub(UserManager<User> userManager, DataContext dataContext, IUserInfoProvider userInfoProvider)
     {
-        _mapper = mapper;
-        _userService = userService;
-        _messageService = messageService;
-        _unitOfWork = unitOfWork;
-        _tracker = tracker;
-        _presenceHub = presenceHub;
-        _userIdProvider = userIdProvider;
+        _userManager = userManager;
+        _dataContext = dataContext;
+        _userInfoProvider = userInfoProvider;
     }
     
     public override async Task OnConnectedAsync()
+    {
+        var userName = Context.User.Identity.Name;
+        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+
+        user.Status = true;
+        _dataContext.Users.Update(user);
+        _dataContext.SaveChanges();
+    }
+
+    public override async Task OnDisconnectedAsync(Exception exception)
+    {
+        var userName = Context.User.Identity.Name;
+        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+
+        user.Status = false;
+        _dataContext.Users.Update(user);
+        _dataContext.SaveChanges();
+    }
+
+    public async Task SendMessage(CreateMessageDto createMessageDto)
+    {
+        var message = new Message
         {
-            var httpContext = Context.GetHttpContext();
-            var fff = httpContext.User.Identity.Name;
-            var ggg = httpContext.Connection.Id;
-            // var otherUser = httpContext.Request.Query["user"].ToString();
-            // var groupName = GetGroupName(Context.User.GetUserName(), otherUser);
-            // await Groups.AddToGroupAsync(Context.ConnectionId, groupName);
-            // var group = await AddToGroup(groupName);
-            // await Clients.Group(groupName).SendAsync("UpdatedGroup", group);
-            //
-            // var messages = await _messageService.
-            //     GetMessageThread(Context.User.GetUserName(), otherUser);
-            //
-            // if (_unitOfWork.HasChanges()) await _unitOfWork.Complete();
-            //
-            // await Clients.Caller.SendAsync("ReceiveMessageThread", messages);
-            var cth = Context.User.Identity.Name;
+            Content = "eloelo",
+            RoomId = "5fe0f2e1-f765-4543-92b0-f5a803d99c59",
+            SenderUserName = _userInfoProvider.Name
+        };
 
-        }
-
-        public override async Task OnDisconnectedAsync(Exception exception)
+        await Clients.Group("5fe0f2e1-f765-4543-92b0-f5a803d99c59").SendAsync("ReceiveMessage", message);
+        await _dataContext.Messages.AddAsync(message);
+        await _dataContext.SaveChangesAsync();
+    }
+    
+    
+    public async Task CreateRoom(User user)
+    {
+        var currentUserName = Context.User.Identity.Name;
+        
+        var room = new Room
         {
-            // var group = await RemoveFromMessageGroup();
-            // await Clients.Group(group.Name).SendAsync("UpdatedGroup", group);
-            // await base.OnDisconnectedAsync(exception);
-        }
-
-        public async Task SendMessage(CreateMessageDto createMessageDto)
+        };
+        await _dataContext.Rooms.AddAsync(room);
+        await _dataContext.SaveChangesAsync();
+        
+        var currCon = new Connection
         {
-            //var userid = _userIdProvider.GetUserId()
-            
-            var username = Context.User.GetUserName();
+            UserId = _userInfoProvider.Id,
+            RoomId = room.RoomId
+        };
+        await _dataContext.Connections.AddAsync(currCon);
+        await _dataContext.SaveChangesAsync();
 
-            if (username == createMessageDto.RecipientUsername.ToLower())
-                throw new HubException("You cannot send messages to yourself");
-
-            var sender = await _userService.GetUserByUsernameAsync(username);
-            var recipient = await _userService.GetUserByUsernameAsync(createMessageDto.RecipientUsername);
-
-            if (recipient == null) throw new HubException("Not found user");
-
-            var message = new Message
+         var drawCon = new Connection
+         {
+             UserId = user.Id,
+             RoomId = room.RoomId
+         };
+        
+        await  _dataContext.Connections.AddAsync(drawCon);
+        await _dataContext.SaveChangesAsync();
+    }
+    
+    public async Task JoinRoom(Room room)
+    {
+        var messages = _dataContext.Messages.Where(x => x.RoomId == room.RoomId)
+            .Select(query=> new SingleMessageDto
             {
-                Sender = sender,
-                Recipient = recipient,
-                SenderUsername = sender.UserName,
-                RecipientUsername = recipient.UserName,
-                Content = createMessageDto.Content
-            };
+                From = query.SenderUserName,
+                Content = query.Content,
+                Date = query.CreatedAt
+            }).ToList();
 
-            var groupName = GetGroupName(sender.UserName, recipient.UserName);
+        await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
+        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has joined");
+        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", messages);
+    }
 
-            var group = await _messageService.GetMessageGroup(groupName);
-
-            // if (group.Connections.Any(x => x.UserName == recipient.UserName))
-            // {
-            //     message.DateRead = DateTime.UtcNow;
-            // }
-            // else
-            // {
-            //     var connections = await _tracker.GetConnectionsForUser(recipient.UserName);
-            //     if (connections != null)
-            //     {
-            //         await _presenceHub.Clients.Clients(connections).SendAsync("NewMessageReceived",
-            //             new { username = sender.UserName });
-            //     }
-            // }
-
-            _messageService.AddMessage(message);
-
-            if (await _unitOfWork.Complete())
-            {
-                await Clients.Group(groupName).SendAsync("NewMessage", _mapper.Map<MessageDto>(message));
-            }
-        }
-
-        private async Task<Group> AddToGroup(string groupName)
-        {
-            var group = await _messageService.GetMessageGroup(groupName);
-            var connection = new Connection(Context.ConnectionId, Context.User.GetUserName());
-
-            if (group == null)
-            {
-                group = new Group(groupName);
-                _messageService.AddGroup(group);
-            }
-
-            group.Connections.Add(connection);
-
-            if (await _unitOfWork.Complete()) return group;
-
-            throw new HubException("Failed to join group");
-        }
-
-        private async Task<Group> RemoveFromMessageGroup()
-        {
-            var group = await _messageService.GetGroupForConnection(Context.ConnectionId);
-            var connection = group.Connections.FirstOrDefault(x => x.ConnectionId == Context.ConnectionId);
-            _messageService.RemoveConnection(connection);
-            if (await _unitOfWork.Complete()) return group;
-
-            throw new HubException("Failed to remove from group");
-        }
-
-        private string GetGroupName(string caller, string other)
-        {
-            var stringCompare = string.CompareOrdinal(caller, other) < 0;
-            return stringCompare ? $"{caller}-{other}" : $"{other}-{caller}";
-        }
+    public async Task LeaveRoom(Room room)
+    {
+        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has left.");
+        await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.RoomId);
+    }
 }
     

@@ -36,12 +36,10 @@ public class UserInfoDto
     public string Major { get; set; }
 }
 
-public class FindUserDto
+public class DrawUserDto
 {
+    public string Id { get; set; }
     public string Nick { get; set; }
-    public LastMessageDto LastMessage { get; set; }
-    public string RoomId { get; set; }
-    public DateTime CreatedDateTime { get; set; }
 }
 
 public class UserEditDto

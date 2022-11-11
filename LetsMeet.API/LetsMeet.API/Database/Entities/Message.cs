@@ -1,17 +1,25 @@
-﻿namespace LetsMeet.API.Database.Entities;
+﻿using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-public class Message
+namespace LetsMeet.API.Database.Entities;
+
+public class Message : ICreatedAt
 {
     public int Id { get; set; }
-    public int SenderId { get; set; }
-    public string SenderUsername { get; set; }
-    public User Sender { get; set; }
-    public int RecipientId { get; set; }
-    public string RecipientUsername { get; set; }
-    public User Recipient { get; set; }
+    public string SenderUserName { get; set; }
     public string Content { get; set; }
-    public DateTime? DateRead { get; set; }
     public DateTime MessageSent { get; set; } = DateTime.UtcNow;
-    public bool SenderDeleted { get; set; }
-    public bool RecipientDeleted { get; set; }
+    public string RoomId { get; set; }
+    public Room Room { get; set; }
+    public DateTime CreatedAt { get; set; }
+}
+
+public class MessagenConfiguration : IEntityTypeConfiguration<Message>
+{
+    public void Configure(EntityTypeBuilder<Message> message)
+    {
+        message.HasKey(x => x.Id)
+            .IsClustered(true);
+
+    }
 }

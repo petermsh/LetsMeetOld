@@ -1,7 +1,6 @@
 ﻿using AutoMapper;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
-using LetsMeet.API.Helper;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -14,22 +13,20 @@ namespace LetsMeet.API.Controllers;
 
 [ApiController]
 [Route("[controller]")]
+[Authorize]
 public class UserController : Controller
 {
-    private readonly IMapper _mapper;
     private readonly IUserService _userService;
 
-    public UserController(IMapper mapper, IUserService userService)
+    public UserController(IUserService userService)
     {
-        _mapper = mapper;
         _userService = userService;
     }
 
-    [HttpGet]
-    public async Task<ActionResult<IEnumerable<UserInfoDto>>> GetUsers([FromQuery] UserParams userParams)
+    [HttpGet("info")]
+    public IActionResult GetInfo()
     {
-        var users = await _userService.GetUsers();
-        var userlist = _mapper.Map<IEnumerable<UserInfoDto>>(users);
-        return Ok(userlist);
+        var user = _userService.GetInfo();
+        return Ok(user);
     }
 }

@@ -8,34 +8,25 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjU2N2VkZGE4LTA1ZWEtNDE1ZS1hZDI5LTQ1YjRiNzZkYTZkYiIsIm5hbWUiOiJwam90ZXIiLCJleHAiOjE2Njk3NDMyMTksImlzcyI6IkQzOTc1MkY3LTlEMzEtNEM5Ny1CREMzLUMyQUJCRDJDQkE4NSIsImF1ZCI6IkQzOTc1MkY3LTlEMzEtNEM5Ny1CREMzLUMyQUJCRDJDQkE4NSJ9.gi2WK9DiYY7Y8BKS0xQBtRVw8R4lINTbpafhH9uIzbo"})
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFlNzIwN2YwLTI0ODItNGE3Yy04OTUyLWZmZTg1OWFiMTVkNCIsIm5hbWUiOiJKb2huIiwiZXhwIjoxNjY5ODIyMjM4LCJpc3MiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUiLCJhdWQiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUifQ.x_5qL9Ko1wc4WU7bDCUR3JmNwMvGcL2cRpKJGKbaDaY"})
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
     const _connect = () => connection.start();
     const _disconnect = () => connection.stop();
-
-    connection.on('UserIsOnline', (message) =>{
-        console.log(message)
-    })
     
-    connection.on('GetOnlineUsers', (lUsers) => {
-        console.log(lUsers)
-    })
-    
-    connection.on('GetUserId', (userId) => {s
-        console.log(userId)
-    })
-    connection.on('msg', (connid) => {
+    connection.on('ReceiveMessage', (connid) => {
 		console.log(connid)
     })
-	
-    const _users = () => connection.invoke('ConnectedUsers');
 
-    const _userId = () => connection.invoke('DrawUser');
-	
-	const _connid = () => connection.invoke('GetInfo');
 
+    const _create = async (user) => connection.invoke('CreateRoom', {Id: user})
+        .then(() => {
+            console.log('git')
+        })
+        .catch(error=>{
+            console.log("fuck", error)
+        })
 
     const _join = async (room) => connection.invoke('JoinRoom', {roomId: room})
         .then(() => {
@@ -53,7 +44,7 @@
             console.log("fuck", error)
         })
 
-    const _send = (message) => connection.invoke("SendMessage", {Body: message});
+    const _send = (room) => connection.invoke("SendMessage", {roomId: room});
 
 
 

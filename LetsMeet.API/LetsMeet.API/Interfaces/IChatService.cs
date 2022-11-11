@@ -1,8 +1,9 @@
-﻿using LetsMeet.API.DTO;
+﻿using LetsMeet.API.Database.Entities;
+using LetsMeet.API.DTO;
 
 namespace LetsMeet.API.Interfaces;
 
 public interface IChatService
 {
-    public string? DrawUser();
+    public DrawUserDto DrawUser();
 }

@@ -8,12 +8,14 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImFlNzIwN2YwLTI0ODItNGE3Yy04OTUyLWZmZTg1OWFiMTVkNCIsIm5hbWUiOiJKb2huIiwiZXhwIjoxNjY5ODIyMjM4LCJpc3MiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUiLCJhdWQiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUifQ.x_5qL9Ko1wc4WU7bDCUR3JmNwMvGcL2cRpKJGKbaDaY"})
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3ODcyMzExLTBkYTEtNDlmMi1iNDQ2LWY3ZGQ4MThhNWM4NCIsIm5hbWUiOiJKb2huIiwiZXhwIjoxNjcwMzQ1NzU5LCJpc3MiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUiLCJhdWQiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUifQ.FN5DT1THFXnCKichqU54TquYxAleTR86cQcfY51Bgyk"})
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
     const _connect = () => connection.start();
     const _disconnect = () => connection.stop();
+    
+    const _getRooms = async () => connection.invoke('GetRoomsList');
     
     connection.on('ReceiveMessage', (connid) => {
 		console.log(connid)

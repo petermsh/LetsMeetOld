@@ -3,7 +3,6 @@ using System.Security.Cryptography;
 using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.Interfaces;
-using LetsMeet.API.Migrations;
 using Microsoft.AspNetCore.SignalR;
 
 namespace LetsMeet.API.Services;

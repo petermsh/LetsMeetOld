@@ -8,7 +8,7 @@ public class Message : ICreatedAt
     public int Id { get; set; }
     public string SenderUserName { get; set; }
     public string Content { get; set; }
-    public DateTime MessageSent { get; set; } = DateTime.UtcNow;
+    public string MessageSent { get; set; } = DateTime.UtcNow.ToString("O");
     public string RoomId { get; set; }
     public Room Room { get; set; }
     public DateTime CreatedAt { get; set; }

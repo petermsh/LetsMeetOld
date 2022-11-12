@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LetsMeet.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221111174353_fixes_v2")]
-    partial class fixes_v2
+    [Migration("20221112165407_init")]
+    partial class init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -63,8 +63,12 @@ namespace LetsMeet.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("MessageSent")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("MessageSent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoomId")
                         .IsRequired()

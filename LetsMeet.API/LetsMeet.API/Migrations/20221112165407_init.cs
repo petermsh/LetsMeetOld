@@ -181,8 +181,7 @@ namespace LetsMeet.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    UserId1 = table.Column<string>(type: "nvarchar(450)", nullable: true)
+                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -194,16 +193,10 @@ namespace LetsMeet.API.Migrations
                         principalTable: "AspNetUsers",
                         principalColumn: "Id");
                     table.ForeignKey(
-                        name: "FK_Connections_AspNetUsers_UserId1",
-                        column: x => x.UserId1,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Connections_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
-                        principalColumn: "RoomId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "RoomId");
                 });
 
             migrationBuilder.CreateTable(
@@ -213,25 +206,20 @@ namespace LetsMeet.API.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     SenderUserName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SenderId = table.Column<string>(type: "nvarchar(450)", nullable: true),
                     Content = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    MessageSent = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                    MessageSent = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    RoomId = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    CreatedAt = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Messages", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Messages_AspNetUsers_SenderId",
-                        column: x => x.SenderId,
-                        principalTable: "AspNetUsers",
-                        principalColumn: "Id");
+                    table.PrimaryKey("PK_Messages", x => x.Id)
+                        .Annotation("SqlServer:Clustered", true);
                     table.ForeignKey(
                         name: "FK_Messages_Rooms_RoomId",
                         column: x => x.RoomId,
                         principalTable: "Rooms",
-                        principalColumn: "RoomId",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "RoomId");
                 });
 
             migrationBuilder.CreateIndex(
@@ -284,19 +272,9 @@ namespace LetsMeet.API.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Connections_UserId1",
-                table: "Connections",
-                column: "UserId1");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Messages_RoomId",
                 table: "Messages",
                 column: "RoomId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Messages_SenderId",
-                table: "Messages",
-                column: "SenderId");
         }
 
         protected override void Down(MigrationBuilder migrationBuilder)

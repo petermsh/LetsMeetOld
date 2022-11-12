@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
 using Microsoft.AspNetCore.Authorization;
+using Newtonsoft.Json;
 
 namespace LetsMeet.API.Hubs;
 
@@ -55,12 +56,12 @@ public class ChatHub : Hub
     {
         var message = new Message
         {
-            Content = "eloelo",
-            RoomId = "5fe0f2e1-f765-4543-92b0-f5a803d99c59",
+            Content = createMessageDto.Content,
+            RoomId = createMessageDto.RoomId,
             SenderUserName = _userInfoProvider.Name
         };
 
-        await Clients.Group("5fe0f2e1-f765-4543-92b0-f5a803d99c59").SendAsync("ReceiveMessage", message);
+        await Clients.Group(createMessageDto.RoomId).SendAsync("ReceiveMessage", message);
         await _dataContext.Messages.AddAsync(message);
         await _dataContext.SaveChangesAsync();
     }
@@ -101,18 +102,31 @@ public class ChatHub : Hub
             {
                 From = query.SenderUserName,
                 Content = query.Content,
-                Date = query.CreatedAt
+                Date = query.MessageSent
             }).ToList();
 
         await Groups.AddToGroupAsync(Context.ConnectionId, room.RoomId);
-        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has joined");
+        //await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has joined");
         await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", messages);
     }
 
     public async Task LeaveRoom(Room room)
     {
-        await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has left.");
+        //await Clients.Group(room.RoomId).SendAsync("ReceiveMessage", $"{Context.User.Identity.Name} has left.");
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.RoomId);
+    }
+
+    public async Task GetRoomsList()
+    {
+        var rooms = _dataContext.Rooms
+            .Select(query=>new RoomInfoDto
+            {
+                RoomId = query.RoomId,
+                RoomName = query.RoomName,
+            }).ToList();
+
+        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", rooms);
+
     }
 }
     

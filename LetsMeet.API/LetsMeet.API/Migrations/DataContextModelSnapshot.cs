@@ -4,7 +4,6 @@ using LetsMeet.API.Database;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
-using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -12,10 +11,9 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LetsMeet.API.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20221106153944_fixes")]
-    partial class fixes
+    partial class DataContextModelSnapshot : ModelSnapshot
     {
-        protected override void BuildTargetModel(ModelBuilder modelBuilder)
+        protected override void BuildModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -26,11 +24,11 @@ namespace LetsMeet.API.Migrations
 
             modelBuilder.Entity("LetsMeet.API.Database.Entities.Connection", b =>
                 {
-                    b.Property<int>("ConnectionId")
+                    b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("int");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("ConnectionId"), 1L, 1);
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"), 1L, 1);
 
                     b.Property<string>("RoomId")
                         .IsRequired()
@@ -40,18 +38,13 @@ namespace LetsMeet.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
-                    b.Property<string>("UserId1")
-                        .HasColumnType("nvarchar(450)");
+                    b.HasKey("Id");
 
-                    b.HasKey("ConnectionId");
-
-                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("ConnectionId"));
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
 
                     b.HasIndex("RoomId");
 
                     b.HasIndex("UserId");
-
-                    b.HasIndex("UserId1");
 
                     b.ToTable("Connections");
                 });
@@ -68,14 +61,15 @@ namespace LetsMeet.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("MessageSent")
+                    b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
+
+                    b.Property<string>("MessageSent")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("RoomId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<string>("SenderId")
                         .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("SenderUserName")
@@ -84,9 +78,9 @@ namespace LetsMeet.API.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("RoomId");
+                    SqlServerKeyBuilderExtensions.IsClustered(b.HasKey("Id"));
 
-                    b.HasIndex("SenderId");
+                    b.HasIndex("RoomId");
 
                     b.ToTable("Messages");
                 });
@@ -336,18 +330,14 @@ namespace LetsMeet.API.Migrations
                     b.HasOne("LetsMeet.API.Database.Entities.Room", "Room")
                         .WithMany("Connections")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("LetsMeet.API.Database.Entities.User", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("LetsMeet.API.Database.Entities.User", null)
+                    b.HasOne("LetsMeet.API.Database.Entities.User", "User")
                         .WithMany("Connections")
-                        .HasForeignKey("UserId1");
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.ClientCascade)
+                        .IsRequired();
 
                     b.Navigation("Room");
 
@@ -359,16 +349,10 @@ namespace LetsMeet.API.Migrations
                     b.HasOne("LetsMeet.API.Database.Entities.Room", "Room")
                         .WithMany("Messages")
                         .HasForeignKey("RoomId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.ClientCascade)
                         .IsRequired();
 
-                    b.HasOne("LetsMeet.API.Database.Entities.User", "Sender")
-                        .WithMany()
-                        .HasForeignKey("SenderId");
-
                     b.Navigation("Room");
-
-                    b.Navigation("Sender");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>

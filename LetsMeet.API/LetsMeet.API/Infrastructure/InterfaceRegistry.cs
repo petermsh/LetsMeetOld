@@ -15,6 +15,7 @@ public static class InterfaceRegistry
         return services
             .AddScoped<IUserService, UserService>()
             .AddScoped<IChatService, ChatService>()
+            .AddScoped<IRoomService, RoomService>()
             .AddScoped<IMessageService, MessageService>()
             .AddScoped<ErrorHandlingMiddleware>()
             .AddScoped<UserManager<User>, UserManager<User>>()

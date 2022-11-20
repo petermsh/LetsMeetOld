@@ -10,7 +10,8 @@ public class Room : ICreatedAt
     [DatabaseGenerated((DatabaseGeneratedOption.Identity))]
     public string RoomId { get; set; }
     public string? RoomName { get; set; }
-    public ICollection<Connection> Connections { get; set; }
+    public bool isLocked { get; set; }
+    public ICollection<User> Users { get; set; }
     public ICollection<Message> Messages { get; set; }
     public DateTime CreatedAt { get; set; }
 }
@@ -21,12 +22,11 @@ public class RoomConfiguration : IEntityTypeConfiguration<Room>
     {
         room.HasKey(s => s.RoomId);
 
+        room.Property(r => r.isLocked)
+            .IsRequired()
+            .HasDefaultValue(false);
+
         room.HasMany(x => x.Messages)
-            .WithOne(x => x.Room)
-            .HasForeignKey(x => x.RoomId)
-            .OnDelete(DeleteBehavior.ClientCascade);
-        
-        room.HasMany(x => x.Connections)
             .WithOne(x => x.Room)
             .HasForeignKey(x => x.RoomId)
             .OnDelete(DeleteBehavior.ClientCascade);

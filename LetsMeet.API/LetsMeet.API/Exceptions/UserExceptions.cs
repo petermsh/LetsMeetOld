@@ -9,7 +9,7 @@ public class UserNotFoundException : ProjectException
 
 public class UserWrongPasswordException : ProjectException
 {
-    public UserWrongPasswordException() : base($"Wprowadzone hasło jest nieprawidłowe.") { }
+    public UserWrongPasswordException() : base($"Wprowadzone hasło jest nieprawidłowe.", HttpStatusCode.NotFound) { }
 }
 
 public class UserWrongRepeatedPasswordException : ProjectException

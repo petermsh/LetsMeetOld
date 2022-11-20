@@ -15,7 +15,7 @@ public class User :  IdentityUser, ICreatedAt, IModifiedAt
     public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
 
-    public ICollection<Connection>? Connections { get; set; }
+    public ICollection<Room>? Rooms { get; set; }
 }
 
 public class UserConfiguration : IEntityTypeConfiguration<User>
@@ -27,10 +27,8 @@ public class UserConfiguration : IEntityTypeConfiguration<User>
             .HasDefaultValue(true);
 
         user.Property(x => x.City).IsRequired();
-        
-        user.HasMany(x => x.Connections)
-            .WithOne(x => x.User)
-            .HasForeignKey(x => x.UserId)
-            .OnDelete(DeleteBehavior.ClientCascade);
+
+        user.HasMany(x => x.Rooms)
+            .WithMany(r => r.Users);
     }
 }

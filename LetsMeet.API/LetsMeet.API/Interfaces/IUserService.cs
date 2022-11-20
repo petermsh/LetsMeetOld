@@ -10,4 +10,5 @@ public interface IUserService
     Task<UserReturnDto> Register(UserRegDto userRegDto);
     Task<UserReturnDto> Login(UserLoginDto userRegDto);
     UserInfoDto GetInfo();
+    Task UpdateInfo(UserEditDto userEditDto);
 }

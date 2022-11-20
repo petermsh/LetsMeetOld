@@ -48,6 +48,7 @@ public class UserEditDto
     public string Bio { get; set; }
     public string City { get; set; }
     public string University { get; set; }
+    public string Major { get; set; }
 }
 
 public class UserEditDtoValidator : AbstractValidator<UserEditDto>

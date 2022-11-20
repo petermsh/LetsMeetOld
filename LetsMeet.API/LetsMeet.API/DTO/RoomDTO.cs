@@ -4,4 +4,5 @@ public class RoomInfoDto
 {
     public string RoomId { get; init; }
     public string? RoomName { get; init; }
+    public string? LastMessage { get; init; }
 }

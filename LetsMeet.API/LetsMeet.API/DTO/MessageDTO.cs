@@ -7,6 +7,7 @@ public class SingleMessageDto
     public string From { get; set; }
     public string Content { get; set; }
     public string Date { get; set; }
+    public bool FromUser { get; set; }
 }
 
 public class LastMessageDto

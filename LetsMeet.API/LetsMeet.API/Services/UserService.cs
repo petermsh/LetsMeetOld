@@ -108,6 +108,24 @@ internal class UserService : IUserService
         return info;
     }
 
+    public async Task UpdateInfo(UserEditDto userEditDto)
+    {
+        var user = _userInfoProvider.CurrentUser;
+        if (user is null)
+        {
+            throw new UserNotFoundException("");
+        }
+
+        user.UserName = userEditDto.Nick;
+        user.Bio = userEditDto.Bio;
+        user.City = userEditDto.City;
+        user.University = userEditDto.University;
+        user.Major = userEditDto.Major;
+
+        _dataContext.Users.Update(user);
+        await _dataContext.SaveChangesAsync();
+    }
+
     private async Task<bool> UserNameExists(string username)
     {
         return await _userManager.Users.AnyAsync(x => x.UserName == username);

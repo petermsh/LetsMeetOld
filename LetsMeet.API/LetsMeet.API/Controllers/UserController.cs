@@ -29,4 +29,11 @@ public class UserController : Controller
         var user = _userService.GetInfo();
         return Ok(user);
     }
+
+    [HttpPatch("update")]
+    public IActionResult UpdateInfo([FromBody] UserEditDto userEditDto)
+    {
+        var user = _userService.UpdateInfo(userEditDto);
+        return Ok();
+    }
 }

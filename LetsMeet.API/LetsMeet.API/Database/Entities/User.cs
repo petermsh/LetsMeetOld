@@ -1,4 +1,5 @@
 ﻿using System.Security.Principal;
+using LetsMeet.API.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
@@ -12,9 +13,11 @@ public class User :  IdentityUser, ICreatedAt, IModifiedAt
     public string? University { get; set; }
     public string? Major { get; set; }
     public bool? Status { get; set; }
+    public Gender? Gender { get; set; }
+    public int MessageCount { get; set; } = 0;
     public DateTime CreatedAt { get; set; }
     public DateTime? ModifiedAt { get; set; }
-
+    
     public ICollection<Room>? Rooms { get; set; }
 }
 

@@ -8,21 +8,29 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/microsoft-signalr/6.0.1/signalr.js"></script>
 <script>
     let connection = new signalR.HubConnectionBuilder()
-        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6ImY3ODcyMzExLTBkYTEtNDlmMi1iNDQ2LWY3ZGQ4MThhNWM4NCIsIm5hbWUiOiJKb2huIiwiZXhwIjoxNjcwMzQ1NzU5LCJpc3MiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUiLCJhdWQiOiJEMzk3NTJGNy05RDMxLTRDOTctQkRDMy1DMkFCQkQyQ0JBODUifQ.FN5DT1THFXnCKichqU54TquYxAleTR86cQcfY51Bgyk"})
+        .withUrl("https://localhost:7168/chatter", {accessTokenFactory: () => "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Ijg0YjI0ZTA0LWRlM2ItNDdjYi05ZDljLWYzODI3ZDRiYWRlMiIsIm5hbWUiOiJ1c2VyciIsImV4cCI6MTY3NjE5NDcxNiwiaXNzIjoiRDM5NzUyRjctOUQzMS00Qzk3LUJEQzMtQzJBQkJEMkNCQTg1IiwiYXVkIjoiRDM5NzUyRjctOUQzMS00Qzk3LUJEQzMtQzJBQkJEMkNCQTg1In0.DSPi6nvkg2O6UTRN-e1wuc-bOsNuQeLt0IP6NBNcvAQ"})
         .configureLogging(signalR.LogLevel.Information)
         .build();
 
     const _connect = () => connection.start();
     const _disconnect = () => connection.stop();
     
-    const _getRooms = async () => connection.invoke('GetRoomsList');
+    //const _getRooms = async () => connection.invoke('GetRoomsList');
     
+    //const connection = getState().connection;
+    const _getRooms2 = async() => connection.invoke('GetRoomsList')
+        .then((rooms) => {
+            console.log("to pokoje", rooms)
+        })
+        .catch(error=>{
+            console.log("errrrrr", error);
+        })
+
     connection.on('ReceiveMessage', (connid) => {
 		console.log(connid)
     })
 
-
-    const _create = async (user) => connection.invoke('CreateRoom', {Id: user})
+    const _create = async (user) => connection.invoke("CreateRoom", {Id: user})
         .then(() => {
             console.log('git')
         })
@@ -38,7 +46,7 @@
             console.log("fuck", error)
         })
 
-	const _leave = async (room) => connection.invoke('LeaveRoom', {roomId: room})
+	const _leave = async (room) => connection.invoke('LeaveRoom', {room})
         .then(() => {
             console.log('elo')
         })
@@ -46,7 +54,7 @@
             console.log("fuck", error)
         })
 
-    const _send = (room) => connection.invoke("SendMessage", {roomId: room});
+    const _send = (room, content) => connection.invoke("SendMessage", {room, content});
 
 
 

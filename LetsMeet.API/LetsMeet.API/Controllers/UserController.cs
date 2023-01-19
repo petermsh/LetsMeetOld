@@ -30,6 +30,13 @@ public class UserController : Controller
         return Ok(user);
     }
 
+    [HttpGet("userName")]
+    public ActionResult<UserInfoDto> GetUserByName([FromQuery] string userName)
+    {
+        var user = _userService.GetByName(userName);
+        return Ok(user);
+    }
+
     [HttpPatch("update")]
     public IActionResult UpdateInfo([FromBody] UserEditDto userEditDto)
     {

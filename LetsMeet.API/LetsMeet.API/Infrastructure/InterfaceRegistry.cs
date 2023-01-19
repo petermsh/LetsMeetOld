@@ -1,5 +1,6 @@
 ﻿using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
+using LetsMeet.API.DTO;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
 using LetsMeet.API.Services;
@@ -13,9 +14,10 @@ public static class InterfaceRegistry
     public static IServiceCollection RegisterInterfaces(this IServiceCollection services)
     {
         return services
+            .AddScoped<IEmailSender, EmailSender>()
             .AddScoped<IUserService, UserService>()
             .AddScoped<IChatService, ChatService>()
-            .AddScoped<IRoomService, RoomService>()
+            .AddScoped<IRoomService, RoomService>()     
             .AddScoped<IMessageService, MessageService>()
             .AddScoped<ErrorHandlingMiddleware>()
             .AddScoped<UserManager<User>, UserManager<User>>()

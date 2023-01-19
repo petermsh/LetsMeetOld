@@ -9,6 +9,7 @@ public class DataContext : IdentityDbContext<User>
 {
     public DbSet<Message> Messages { get; set; }
     public DbSet<Room> Rooms { get; set; }
+    //public DbSet<RoomUser> RoomUsers { get; set; }
     public DataContext(DbContextOptions<DataContext> options) : base(options)
     {
     }

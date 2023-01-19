@@ -1,10 +1,16 @@
 ﻿using System.Net;
+using Microsoft.AspNetCore.Identity;
 
 namespace LetsMeet.API.Exceptions;
 
 public class UserNotFoundException : ProjectException
 {
     public UserNotFoundException(string login) : base($"Użytkownik {login} nie istnieje.", HttpStatusCode.NotFound) { }
+}
+
+public class UsersNotFoundException : ProjectException
+{
+    public UsersNotFoundException() : base("Nie znaleziono użytkowników", HttpStatusCode.NotFound) { }
 }
 
 public class UserWrongPasswordException : ProjectException
@@ -25,4 +31,11 @@ public class UserEmailAlreadyExistException : ProjectException
 public class UserNameAlreadyExistException : ProjectException
 {
     public UserNameAlreadyExistException(string nick) : base($"Nick {nick} jest już zajęty.") { }
+}
+
+public class RegistrationFailedException : ProjectException
+{
+    public RegistrationFailedException(string errors) : base(errors)
+    {
+    }
 }

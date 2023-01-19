@@ -3,6 +3,7 @@ using System.Security.Cryptography;
 using AutoMapper;
 using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
+using LetsMeet.API.DTO;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
@@ -41,7 +42,8 @@ builder.Services.AddSignalR(options =>
 });
 builder.Services.RegisterInterfaces();
 builder.Services.AddIdentity<User, IdentityRole>()
-    .AddEntityFrameworkStores<DataContext>();
+    .AddEntityFrameworkStores<DataContext>()
+    .AddDefaultTokenProviders();
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", builder =>
@@ -54,6 +56,11 @@ builder.Services.AddCors(options =>
 
 var authOptions = builder.Configuration.GetOptions<AuthOptions>("Auth");
 builder.Services.AddAuth(authOptions);
+
+var emailConfig = builder.Configuration
+    .GetSection("EmailConfiguration")
+    .Get<EmailMessage.EmailConfiguration>();
+builder.Services.AddSingleton(emailConfig);
 
 var app = builder.Build();
 

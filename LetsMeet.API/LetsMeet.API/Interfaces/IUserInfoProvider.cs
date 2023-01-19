@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.SignalR;
 
 namespace LetsMeet.API.Interfaces;
 
+
 public interface IUserInfoProvider : IUserIdProvider
 {
     bool IsLogged { get; }

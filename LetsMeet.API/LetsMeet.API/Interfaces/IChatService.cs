@@ -5,5 +5,5 @@ namespace LetsMeet.API.Interfaces;
 
 public interface IChatService
 {
-    public DrawUserDto DrawUser();
+    public CreatedRoomDto DrawUser(bool isUniversity, bool isCity, int gender);
 }

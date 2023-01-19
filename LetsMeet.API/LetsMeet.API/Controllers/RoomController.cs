@@ -21,4 +21,11 @@ public class RoomController : Controller
         _roomService.ChangeRoomStatus(isLocked, roomId);
         return Ok();
     }
+
+    [HttpDelete("delete")]
+    public IActionResult DeleteRoom([FromQuery] string roomId)
+    {
+        _roomService.DeleteRoom(roomId);
+        return Ok();
+    }
 }

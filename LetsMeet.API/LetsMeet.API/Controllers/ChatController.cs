@@ -1,6 +1,7 @@
 ﻿using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
+using LetsMeet.API.Enums;
 using LetsMeet.API.Hubs;
 using LetsMeet.API.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -22,10 +23,11 @@ public class ChatController : Controller
     }
     
     [HttpGet("draw")]
-    public IActionResult DrawUser()
+    public IActionResult DrawUser(bool isUniversity, bool isCity, [FromQuery] Gender gender)
     {
-        var userName = _chatService.DrawUser();
+        var userName = _chatService.DrawUser(isUniversity, isCity, (int)gender);
         return Ok(userName);
     }
+
 
 }

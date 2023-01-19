@@ -1,7 +1,11 @@
 ﻿using LetsMeet.API.Database;
 using LetsMeet.API.Database.Entities;
 using LetsMeet.API.DTO;
+using LetsMeet.API.Enums;
+using LetsMeet.API.Exceptions;
 using LetsMeet.API.Interfaces;
+using Microsoft.AspNetCore.Components.Web;
+using Microsoft.EntityFrameworkCore;
 
 namespace LetsMeet.API.Services;
 
@@ -16,20 +20,80 @@ public class ChatService : IChatService
         _userInfoProvider = userInfoProvider;
     }
     
-    public DrawUserDto DrawUser()
+    public CreatedRoomDto DrawUser(bool isUniversity, bool isCity, int gender)
     {
-         Random rng = new Random();
-         var users = _dataContext
-              .Users
-              .Where(x=>x.Id != _userInfoProvider.Id && x.Status == true).ToList();
-         var randUser = rng.Next(users.Count());
-         var user = users[randUser];
-         var drawUser = new DrawUserDto
-         {
-             Id = user.Id,
-             Nick = user.UserName
-         };
+        var currentUser = _userInfoProvider.CurrentUser;
+        var secondUser = new User() {};
+        var users = new List<User> {} ;
+        int counter = 0;
+
+        Random rng = new Random();
+        if (gender == 0)
+        {
+            users = _dataContext
+                .Users
+                .Where(x => x.Id != _userInfoProvider.Id)
+                .Where(x => x.Status == true)
+                .ToList();
+        }
+        else
+        {
+            users = _dataContext
+                .Users
+                .Where(x => x.Id != _userInfoProvider.Id)
+                .Where(x => x.Status == true)
+                .Where(x=>x.Gender == (Gender)gender)
+                .ToList();
+        }
         
-        return drawUser;
+
+        if (isCity)
+            users = users.Where(x => x.City == currentUser.City).ToList();
+
+        if (isUniversity)
+            users = users.Where(x => x.University == currentUser.University).ToList();
+
+        users = users.OrderByDescending(x => x.MessageCount)
+            .Take(5)
+            .ToList();
+
+        if (users.Count == 0)
+             throw new UsersNotFoundException();
+        do
+        {
+            var randUser = rng.Next(users.Count());
+            var user = users[randUser];
+            var drawUser = new DrawUserDto
+            {
+                Id = user.Id,
+                UserName = user.UserName
+            };
+
+            secondUser = _dataContext.Users.FirstOrDefault(x => x.Id == drawUser.Id);
+            counter++;
+
+        } while (_dataContext.Rooms
+                     .FirstOrDefault(r => r.Users.Any(u => u.Id == secondUser.Id)
+                                          && r.Users.Any(u => u.Id == currentUser.Id)) is not null
+                 && counter < 10);
+
+        if (counter == 10)
+            throw new UsersNotFoundException();
+        //return drawUser;
+        
+        //temporary
+
+        var room = new Room
+        {
+            Users = new List<User>() { secondUser, currentUser}
+        };
+        _dataContext.Rooms.Add(room);
+        _dataContext.SaveChanges();
+
+        return new CreatedRoomDto()
+        {
+            Users = new List<string>() { currentUser.UserName, secondUser.UserName},
+            roomId = room.RoomId
+        };
     }
 }

@@ -55,10 +55,15 @@ public class ChatHub : Hub
 
     public async Task SendMessage(CreateMessageDto createMessageDto)
     {
+        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == _userInfoProvider.Name);
+
+        if (user is null)
+            throw new UserNotFoundException("");
+        
         var message = new Message
         {
             Content = createMessageDto.Content,
-            RoomId = createMessageDto.RoomId,
+            RoomId = createMessageDto.Room,
             SenderUserName = _userInfoProvider.Name
         };
 
@@ -69,26 +74,28 @@ public class ChatHub : Hub
             From = message.SenderUserName,
             FromUser = _userInfoProvider.Name == message.SenderUserName
         };
+        
 
-        await Clients.Group(createMessageDto.RoomId).SendAsync("ReceiveMessage", singleMessage);
+        await Clients.Group(createMessageDto.Room).SendAsync("ReceiveMessage", singleMessage);
         await _dataContext.Messages.AddAsync(message);
+        user.MessageCount++;
+        _dataContext.Users.Update(user);
         await _dataContext.SaveChangesAsync();
     }
 
     public async Task CreateRoom(User user)
     {
         var currentUserName = Context.User.Identity.Name;
+        var secondUser = _dataContext.Users.FirstOrDefault(x => x.Id == user.Id);
         
         var room = new Room
         {
+            Users = new List<User>() { secondUser, _userInfoProvider.CurrentUser}
         };
-
-        var secondUser = _dataContext.Users.FirstOrDefault(x => x.Id == user.Id);
-        room.Users.Add(secondUser);
-        room.Users.Add(_userInfoProvider.CurrentUser);
+        
         await _dataContext.Rooms.AddAsync(room);
         await _dataContext.SaveChangesAsync();
-        
+        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", room.RoomId);
     }
     
     public async Task JoinRoom(Room room)
@@ -126,18 +133,28 @@ public class ChatHub : Hub
         await Groups.RemoveFromGroupAsync(Context.ConnectionId, room.RoomId);
     }
 
-    public async Task GetRoomsList()
+    public async Task<List<RoomInfoDto>> GetRoomsList()
     {
-        var rooms = _dataContext.Rooms
-            .Where(r=>r.isLocked == false && r.Users.All(x=>x.Id == _userInfoProvider.Id))
+        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == Context.User.Identity.Name);
+
+        if (user is null)
+            throw new UserNotFoundException("");
+        
+        var rooms = await _dataContext.Rooms
+            .Where(r=>r.isLocked == false)
+            .Where(r=>r.Users.Any(x=>x.Id == user.Id))
             .Select(query=>new RoomInfoDto
             {
                 RoomId = query.RoomId,
                 RoomName = query.RoomName,
                 LastMessage = query.Messages.OrderByDescending(x=>x.CreatedAt).FirstOrDefault().Content
-            }).ToList();
+            }).ToListAsync();
 
-        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", rooms);
+        if (rooms is null)
+            throw new RoomsNotFoundException();
+        
+        await Clients.Client(user.Id).SendAsync("ReceiveMessage", rooms);
+        return rooms;
     }
 }
     

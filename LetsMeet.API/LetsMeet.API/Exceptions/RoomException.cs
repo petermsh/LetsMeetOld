@@ -16,3 +16,17 @@ public class RoomNotFoundException : ProjectException
     {
     }
 }
+
+public class RoomsNotFoundException : ProjectException
+{
+    public RoomsNotFoundException() : base("Nie ma żadnego pokoju na liście")
+    {
+    }
+}
+
+public class RoomExistsException : ProjectException
+{
+    public RoomExistsException() : base("Connection exists!")
+    {
+    }
+}

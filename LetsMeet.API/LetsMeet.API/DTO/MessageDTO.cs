@@ -18,6 +18,15 @@ public class LastMessageDto
 
 public class CreateMessageDto
 {
+    public CreateMessageDto()
+    {
+    }
+
+    public CreateMessageDto(string content, string room)
+    {
+        Content = content;
+        Room = room;
+    }
     public string Content { get; set; }
-    public string RoomId { get; set; }
+    public string Room { get; set; }
 }

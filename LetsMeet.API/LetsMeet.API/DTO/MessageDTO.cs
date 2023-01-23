@@ -2,7 +2,15 @@
 
 namespace LetsMeet.API.DTO;
 
-public class SingleMessageDto
+public class SingleMessageAddDto
+{
+    public string From { get; set; }
+    public string Content { get; set; }
+    public string Date { get; set; }
+    public string RoomId { get; set; }
+}
+
+public class SingleMessageToListDto
 {
     public string From { get; set; }
     public string Content { get; set; }

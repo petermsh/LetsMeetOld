@@ -55,7 +55,8 @@ public class ChatHub : Hub
 
     public async Task SendMessage(CreateMessageDto createMessageDto)
     {
-        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == _userInfoProvider.Name);
+        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == Context.User.Identity.Name);
+
 
         if (user is null)
             throw new UserNotFoundException("");
@@ -64,23 +65,23 @@ public class ChatHub : Hub
         {
             Content = createMessageDto.Content,
             RoomId = createMessageDto.Room,
-            SenderUserName = _userInfoProvider.Name
+            SenderUserName = user.UserName
         };
 
-        var singleMessage = new SingleMessageDto
+        var singleMessage = new SingleMessageAddDto
         {
             Content = message.Content,
             Date = message.MessageSent,
             From = message.SenderUserName,
-            FromUser = _userInfoProvider.Name == message.SenderUserName
+            RoomId = createMessageDto.Room
         };
         
-
         await Clients.Group(createMessageDto.Room).SendAsync("ReceiveMessage", singleMessage);
         await _dataContext.Messages.AddAsync(message);
         user.MessageCount++;
         _dataContext.Users.Update(user);
         await _dataContext.SaveChangesAsync();
+
     }
 
     public async Task CreateRoom(User user)
@@ -108,13 +109,13 @@ public class ChatHub : Hub
         }
         
         var messages = _dataContext.Messages.Where(x => x.RoomId == room.RoomId)
-            .Select(query=> new SingleMessageDto
+            .Select(query=> new SingleMessageToListDto
             {
                 From = query.SenderUserName,
                 Content = query.Content,
                 Date = query.MessageSent,
                 FromUser = _userInfoProvider.Name == query.SenderUserName
-            }).OrderByDescending(m=>m.Date).ToList();
+            }).OrderBy(m=>m.Date).ToList();
         
 
         if (rooms.isLocked)
@@ -146,14 +147,13 @@ public class ChatHub : Hub
             .Select(query=>new RoomInfoDto
             {
                 RoomId = query.RoomId,
-                RoomName = query.RoomName,
+                RoomName = query.Users.Where(x=>x.UserName != user.UserName).Select(x=>x.UserName).FirstOrDefault(),
                 LastMessage = query.Messages.OrderByDescending(x=>x.CreatedAt).FirstOrDefault().Content
             }).ToListAsync();
 
         if (rooms is null)
             throw new RoomsNotFoundException();
         
-        await Clients.Client(user.Id).SendAsync("ReceiveMessage", rooms);
         return rooms;
     }
 }

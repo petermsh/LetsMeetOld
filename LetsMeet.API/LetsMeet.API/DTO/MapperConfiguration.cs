@@ -13,6 +13,7 @@ public class MapperConfiguration : Profile
         CreateMap<User, UserLoginDto>().ReverseMap();
         CreateMap<User, UserInfoDto>().ReverseMap();
         CreateMap<User, UserEditDto>().ReverseMap();
-        CreateMap<Message, SingleMessageDto>().ReverseMap();
+        CreateMap<Message, SingleMessageAddDto>().ReverseMap();
+        CreateMap<Message, SingleMessageToListDto>().ReverseMap();
     }
 }

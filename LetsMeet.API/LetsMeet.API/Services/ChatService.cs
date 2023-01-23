@@ -90,6 +90,16 @@ public class ChatService : IChatService
         _dataContext.Rooms.Add(room);
         _dataContext.SaveChanges();
 
+        var message = new Message
+        {
+            Content = "Utworzono konwersację",
+            RoomId = room.RoomId,
+            SenderUserName = "LetsMeet"
+        };
+
+        _dataContext.Messages.Add(message);
+        _dataContext.SaveChanges();
+        
         return new CreatedRoomDto()
         {
             Users = new List<string>() { currentUser.UserName, secondUser.UserName},

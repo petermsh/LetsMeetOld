@@ -15,8 +15,11 @@ using System.Threading.Tasks;
 using LetsMeet.API.Exceptions;
 using LetsMeet.API.Infrastructure;
 using LetsMeet.API.Services;
+using MailKit;
 using Microsoft.AspNetCore.Authorization;
 using Newtonsoft.Json;
+using Npgsql.Replication.PgOutput.Messages;
+using MessageNotFoundException = LetsMeet.API.Exceptions.MessageNotFoundException;
 
 namespace LetsMeet.API.Hubs;
 
@@ -75,13 +78,42 @@ public class ChatHub : Hub
             From = message.SenderUserName,
             RoomId = createMessageDto.Room
         };
-        
+
         await Clients.Group(createMessageDto.Room).SendAsync("ReceiveMessage", singleMessage);
         await _dataContext.Messages.AddAsync(message);
         user.MessageCount++;
         _dataContext.Users.Update(user);
         await _dataContext.SaveChangesAsync();
 
+    }
+
+    public async Task UpdateMessage(UpdateMessageDto updateMessageDto)
+    {
+        var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == Context.User.Identity.Name);
+
+
+        if (user is null)
+            throw new UserNotFoundException("");
+
+        var message = await _dataContext.Messages.FirstOrDefaultAsync(x => x.Id == updateMessageDto.MessageId);
+        if (message is null)
+            throw new MessageNotFoundException();
+
+        message.Content = updateMessageDto.Content;
+        
+        _dataContext.Messages.Update(message);
+        await _dataContext.SaveChangesAsync();
+        
+        var messages = _dataContext.Messages.Where(x => x.RoomId == message.RoomId)
+            .Select(query=> new SingleMessageToListDto
+            {
+                From = query.SenderUserName,
+                Content = query.Content,
+                Date = query.MessageSent,
+                FromUser = _userInfoProvider.Name == query.SenderUserName
+            }).OrderBy(m=>m.Date).ToList();
+        
+        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", messages);
     }
 
     public async Task CreateRoom(User user)

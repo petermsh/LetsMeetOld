@@ -31,8 +31,8 @@ builder.Services.AddControllersWithValidations();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwagger();
 
-// builder.Services.AddDbContext<DataContext>(
-//     o => o.UseNpgsql(builder.Configuration.GetConnectionString("db")));
+//builder.Services.AddDbContext<DataContext>(
+//    o => o.UseNpgsql(builder.Configuration.GetConnectionString("db")));
 builder.Services.AddDbContext<DataContext>(x => x.UseSqlServer(builder.Configuration.GetConnectionString("db")));
 builder.Services.AddHostedService<DbMigrator>();
 builder.Services.AddAutoMapper(typeof(MapperConfiguration).Assembly);

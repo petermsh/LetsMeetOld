@@ -38,3 +38,20 @@ public class CreateMessageDto
     public string Content { get; set; }
     public string Room { get; set; }
 }
+
+public class UpdateMessageDto
+{
+    public UpdateMessageDto()
+    {
+        
+    }
+
+    public UpdateMessageDto(int messageId, string content)
+    {
+        MessageId = messageId;
+        Content = content;
+    }
+
+    public string Content { get; set; }
+    public int MessageId { get; set; }
+}

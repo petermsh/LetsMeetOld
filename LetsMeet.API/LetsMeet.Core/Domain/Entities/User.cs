@@ -15,6 +15,12 @@ public class User : IdentityUser<Guid>, IModifiedAt, ICreatedAt
     public int MessageCount { get; set; } = 0;
     public DateTimeOffset CreatedAt { get; set; }
     public DateTimeOffset? ModifiedAt { get; set; }
-    
+
     public ICollection<Room>? Rooms { get; set; }
+
+    public Guid GetUserId()
+    {
+        return Id;
+    }
+
 }

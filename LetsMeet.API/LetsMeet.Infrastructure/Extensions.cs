@@ -28,6 +28,9 @@ public static class Extensions
         var authOptions = configuration.GetSection("Auth").Get<AuthOptions>();
         services.AddScoped<AuthOptions>(x => authOptions);
         
+        services.AddAuth(authOptions);
+        services.AddSwagger();
+        
         services.AddScoped<UserManager<User>, UserManager<User>>();
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IAuthManager, AuthManager>();

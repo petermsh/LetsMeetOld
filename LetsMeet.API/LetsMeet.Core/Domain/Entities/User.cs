@@ -23,4 +23,8 @@ public class User : IdentityUser<Guid>, IModifiedAt, ICreatedAt
         return Id;
     }
 
+    public void ChangeStatus(bool status) => Status = status;
+
+    public void CountMessage() => MessageCount++;
+
 }

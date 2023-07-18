@@ -12,6 +12,9 @@ internal sealed class LetsMeetDbContext : IdentityDbContext<User, IdentityRole<G
     {
     }
     
+    public DbSet<Room> Rooms { get; set; }
+    public DbSet<Message> Messages { get; set; }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);

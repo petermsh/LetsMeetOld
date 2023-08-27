@@ -14,6 +14,11 @@ public static class Extensions
             .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<,>)))
             .AsImplementedInterfaces()
             .WithScopedLifetime());
+        
+        services.Scan(s => s.FromAssemblies(applicationAssembly)
+            .AddClasses(x => x.AssignableTo(typeof(ICommandHandler<>)))
+            .AsImplementedInterfaces()
+            .WithScopedLifetime());
 
         return services;
     }

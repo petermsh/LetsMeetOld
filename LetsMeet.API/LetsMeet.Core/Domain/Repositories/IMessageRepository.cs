@@ -7,5 +7,5 @@ public interface IMessageRepository
     Task AddAsync(Message message);
     Task RemoveAsync(Message message);
     Task UpdateAsync(Message message);
-    Task GetAsync(int id);
+    Task<Message> GetAsync(int id);
 }

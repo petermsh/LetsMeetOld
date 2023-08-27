@@ -9,7 +9,6 @@ public class Message : ICreatedAt
     public string Content { get; set; }
     public string MessageSent { get; set; } = DateTime.UtcNow.ToString("O");
     public DateTimeOffset CreatedAt { get; set; }
-    
     public string RoomId { get; set; }
     public Room Room { get; set; }
 }

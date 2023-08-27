@@ -33,6 +33,6 @@ internal class MessageRepository : IMessageRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task GetAsync(int id)
+    public async Task<Message> GetAsync(int id)
         => await _messages.SingleOrDefaultAsync(x => x.Id == id);
 }

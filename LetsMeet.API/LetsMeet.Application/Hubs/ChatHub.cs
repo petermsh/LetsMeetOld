@@ -1,5 +1,6 @@
 ﻿using LetsMeet.Application.Abstractions;
 using LetsMeet.Application.Commands.Message.SendMessage;
+using LetsMeet.Application.Commands.Message.UpdateMessage;
 using LetsMeet.Application.DTO.Message;
 using LetsMeet.Application.DTO.Room;
 using LetsMeet.Application.Exceptions.Room;
@@ -20,16 +21,18 @@ public class ChatHub : Hub
     private readonly UserManager<User> _userManager;
     private readonly IRoomRepository _roomRepository;
     private readonly ICommandHandler<SendMessageCommand, string> _sendMessageHandler;
+    private readonly ICommandHandler<UpdateMessageCommand> _updateMessageHandler;
     private readonly IQueryHandler<GetMessagesFromRoom, List<MessageDetailsDto>> _getMessagesHandler;
     private readonly IQueryHandler<GetRooms, List<RoomsDto>> _getRoomsHandler;
 
-    public ChatHub(UserManager<User> userManager, ICommandHandler<SendMessageCommand, string> sendMessageHandler, IQueryHandler<GetMessagesFromRoom, List<MessageDetailsDto>> getMessagesHandler, IRoomRepository roomRepository, IQueryHandler<GetRooms, List<RoomsDto>> getRoomsHandler)
+    public ChatHub(UserManager<User> userManager, ICommandHandler<SendMessageCommand, string> sendMessageHandler, IQueryHandler<GetMessagesFromRoom, List<MessageDetailsDto>> getMessagesHandler, IRoomRepository roomRepository, IQueryHandler<GetRooms, List<RoomsDto>> getRoomsHandler, ICommandHandler<UpdateMessageCommand> updateMessageHandler)
     {
         _userManager = userManager;
         _sendMessageHandler = sendMessageHandler;
         _getMessagesHandler = getMessagesHandler;
         _roomRepository = roomRepository;
         _getRoomsHandler = getRoomsHandler;
+        _updateMessageHandler = updateMessageHandler;
     }
     
     public override async Task OnConnectedAsync()
@@ -64,7 +67,23 @@ public class ChatHub : Hub
 
         var currentUserRooms = await _getRoomsHandler.HandleAsync(new GetRooms(user.Id));
         await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRooms", currentUserRooms);
+    }
+    
+    public async Task UpdateMessage(UpdateMessageDto updateMessageDto)
+    {
+        var userName = Context.User.Identity.Name;
+        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
         
+        if (user is null)
+            throw new UserNotFoundException("");
+
+        var command = new UpdateMessageCommand(updateMessageDto.MessageId, updateMessageDto.Content);
+        await _updateMessageHandler.HandleAsync(command);
+
+        var query = new GetMessagesFromRoom(updateMessageDto.RoomId);
+        var messages = await _getMessagesHandler.HandleAsync(query);
+        
+        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", messages);
     }
     
     public async Task JoinRoom(Room room)

@@ -1,4 +1,5 @@
-﻿using LetsMeet.Core.Domain.Entities;
+﻿using System.Linq.Expressions;
+using LetsMeet.Core.Domain.Entities;
 using LetsMeet.Core.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,6 +34,15 @@ internal class RoomRepository : IRoomRepository
         await _dbContext.SaveChangesAsync();
     }
 
-    public async Task GetAsync(Guid id)
-        => await _rooms.SingleOrDefaultAsync(x => x.RoomId == id.ToString());
+    public async Task<Room> GetAsync(string id)
+    { 
+        return await _rooms.SingleOrDefaultAsync(x => x.RoomId == id);
+    }
+
+    public async Task<Room> GetRoomWhereUsersAsync(Guid secondUserId, Guid currentUserId)
+        => await _rooms.SingleOrDefaultAsync(r => r.Users.Any(u => u.Id == secondUserId)
+                                                  && r.Users.Any(u => u.Id == currentUserId));
+
+    public async Task<List<Room>> GetRoomsAsync(Expression<Func<Room, bool>> predicate)
+        => await _dbContext.Rooms.Where(predicate).ToListAsync();
 }

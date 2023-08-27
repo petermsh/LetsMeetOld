@@ -30,7 +30,7 @@ internal sealed class SignInHandler : ICommandHandler<SignInCommand, UserLoggedD
         {
             throw new UserNotFoundException(command.Login);
         }
-
+        
         var login = await _signInManager.CheckPasswordSignInAsync(user, command.Password, false);
 
         if (!login.Succeeded)

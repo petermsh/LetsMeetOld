@@ -35,6 +35,7 @@ public static class Extensions
         services.AddScoped<IUserRepository, UserRepository>();
         services.AddScoped<IRoomRepository, RoomRepository>();
         services.AddScoped<IMessageRepository, MessageRepository>();
+        services.AddScoped<IUserInfoProvider, UserInfoProvider>();
         services.AddScoped<IAuthManager, AuthManager>();
         services.AddPostgres(configuration);
         return services;

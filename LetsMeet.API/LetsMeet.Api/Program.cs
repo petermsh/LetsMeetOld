@@ -1,3 +1,4 @@
+using System.Text.Json.Serialization;
 using LetsMeet.Application;
 using LetsMeet.Application.Hubs;
 using LetsMeet.Core;
@@ -11,7 +12,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("CorsPolicy", p =>
-        p.WithOrigins("https://localhost:63342")
+        p.WithOrigins("https://localhost:3000")
             .WithOrigins("https://localhost:7120")
             .AllowAnyHeader()
             .AllowAnyMethod()
@@ -24,7 +25,7 @@ builder.Services
     .AddCore()
     .AddInfrastructure(builder.Configuration);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddJsonOptions(options => options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter()));
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 

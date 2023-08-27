@@ -1,4 +1,5 @@
-﻿using LetsMeet.Core.Domain.Entities;
+﻿using System.Linq.Expressions;
+using LetsMeet.Core.Domain.Entities;
 using LetsMeet.Core.Domain.Repositories;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,7 +18,7 @@ internal sealed class UserRepository : IUserRepository
 
     public async Task<User> GetByIdAsync(Guid id)
         => await _users.SingleOrDefaultAsync(x => x.Id == id);
-    
+
     public async Task<User> GetByEmailAsync(string email)
         => await _users.SingleOrDefaultAsync(x => x.Email == email);
 
@@ -29,4 +30,8 @@ internal sealed class UserRepository : IUserRepository
         await _users.AddAsync(user);
         await _dbContext.SaveChangesAsync();
     }
+
+    public async Task<List<User>> GetUsersAsync(Expression<Func<User, bool>> predicate)
+        => await _dbContext.Users.Where(predicate).ToListAsync();
+
 }

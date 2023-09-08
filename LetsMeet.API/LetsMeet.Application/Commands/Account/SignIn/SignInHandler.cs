@@ -5,7 +5,7 @@ using LetsMeet.Application.Security;
 using LetsMeet.Core.Domain.Repositories;
 using Microsoft.AspNetCore.Identity;
 
-namespace LetsMeet.Application.Commands.User.SignIn;
+namespace LetsMeet.Application.Commands.Account.SignIn;
 
 internal sealed class SignInHandler : ICommandHandler<SignInCommand, UserLoggedDto>
 {
@@ -24,11 +24,11 @@ internal sealed class SignInHandler : ICommandHandler<SignInCommand, UserLoggedD
 
     public async Task<UserLoggedDto> HandleAsync(SignInCommand command)
     {
-        var user = await _userRepository.GetByUsernameAsync(command.Login);
+        var user = await _userRepository.GetByEmailAsync(command.Login);
         
         if (user is null)
         {
-            throw new UserNotFoundException(command.Login);
+            throw new UserNotFoundException("");
         }
         
         var login = await _signInManager.CheckPasswordSignInAsync(user, command.Password, false);

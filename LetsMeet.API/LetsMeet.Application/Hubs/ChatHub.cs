@@ -12,6 +12,7 @@ using LetsMeet.Core.Domain.Repositories;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.SignalR;
+using Microsoft.EntityFrameworkCore;
 
 namespace LetsMeet.Application.Hubs;
 
@@ -38,7 +39,7 @@ public class ChatHub : Hub
     public override async Task OnConnectedAsync()
     {
         var userName = Context.User.Identity.Name;
-        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+        var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
 
         if (user is null)
             throw new UserNotFoundException("");
@@ -48,7 +49,7 @@ public class ChatHub : Hub
     public override async Task OnDisconnectedAsync(Exception exception)
     {
         var userName = Context.User.Identity.Name;
-        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+        var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
 
         if (user is null)
             throw new UserNotFoundException("");
@@ -58,7 +59,7 @@ public class ChatHub : Hub
     public async Task SendMessage(CreateMessageDto createMessageDto)
     {
         var userName = Context.User.Identity.Name;
-        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+        var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
         
         var command = new SendMessageCommand(createMessageDto.Room, createMessageDto.Content);
         await _sendMessageHandler.HandleAsync(command);
@@ -72,7 +73,7 @@ public class ChatHub : Hub
     public async Task UpdateMessage(UpdateMessageDto updateMessageDto)
     {
         var userName = Context.User.Identity.Name;
-        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+        var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
         
         if (user is null)
             throw new UserNotFoundException("");
@@ -117,7 +118,7 @@ public class ChatHub : Hub
     public async Task GetRoomsList()
     {
         var userName = Context.User.Identity.Name;
-        var user = _userManager.Users.SingleOrDefault(x => x.UserName == userName);
+        var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
         
         if (user is null)
             throw new UserNotFoundException("");

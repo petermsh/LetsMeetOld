@@ -5,7 +5,7 @@ using LetsMeet.Application.Security;
 using LetsMeet.Core.Domain.Entities;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LetsMeet.Infrastructure.Auth;
+namespace LetsMeet.Infrastructure.Services.Auth;
 
 public sealed class AuthOptions
 {

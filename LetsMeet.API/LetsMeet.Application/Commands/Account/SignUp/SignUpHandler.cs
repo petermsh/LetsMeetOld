@@ -6,7 +6,7 @@ using LetsMeet.Core.Domain.Enums;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
-namespace LetsMeet.Application.Commands.User.SignUp;
+namespace LetsMeet.Application.Commands.Account.SignUp;
 
 internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedDto>
 {

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.IdentityModel.Tokens;
 
-namespace LetsMeet.Infrastructure.Auth;
+namespace LetsMeet.Infrastructure.Services.Auth;
 
 public static class AuthExtensions
 {

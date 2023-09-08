@@ -31,6 +31,12 @@ internal sealed class UserRepository : IUserRepository
         await _dbContext.SaveChangesAsync();
     }
 
+    public async Task UpdateAsync(User user)
+    {
+        _users.Update(user);
+        await _dbContext.SaveChangesAsync();
+    }
+
     public async Task<List<User>> GetUsersAsync(Expression<Func<User, bool>> predicate)
         => await _dbContext.Users.Where(predicate).ToListAsync();
 

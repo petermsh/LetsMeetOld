@@ -3,7 +3,7 @@ using LetsMeet.Application;
 using LetsMeet.Application.Hubs;
 using LetsMeet.Core;
 using LetsMeet.Infrastructure;
-using LetsMeet.Infrastructure.Auth;
+using LetsMeet.Infrastructure.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 

@@ -1,10 +1,8 @@
 ﻿using System.Security.Claims;
-using LetsMeet.Application;
 using LetsMeet.Application.Abstractions;
-using LetsMeet.Core.Domain.Entities;
 using Microsoft.AspNetCore.Http;
 
-namespace LetsMeet.Infrastructure;
+namespace LetsMeet.Infrastructure.Services;
 
 public class UserInfoProvider : IUserInfoProvider
 {

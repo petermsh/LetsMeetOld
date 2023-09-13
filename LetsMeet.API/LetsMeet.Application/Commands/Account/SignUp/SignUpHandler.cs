@@ -1,5 +1,6 @@
 ﻿using LetsMeet.Application.Abstractions;
 using LetsMeet.Application.DTO.User;
+using LetsMeet.Application.Exceptions.Account;
 using LetsMeet.Application.Exceptions.User;
 using LetsMeet.Application.Security;
 using LetsMeet.Core.Domain.Enums;
@@ -22,14 +23,15 @@ internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedD
     public async Task<UserLoggedDto> HandleAsync(SignUpCommand command)
     {
         if (await UserNameExists(command.UserName))
-        {
             throw new UserNameAlreadyExistException(command.UserName);
-        }
+        
         
         if (await UserEmailExists(command.Email))
-        {
             throw new UserEmailAlreadyExistException(command.Email);
-        }
+        
+
+        if (command.Password != command.RepeatedPassword)
+            throw new WrongRepeatedPasswordException();
         
         var user = new Core.Domain.Entities.User()
         {

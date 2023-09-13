@@ -6,7 +6,7 @@ namespace LetsMeet.Infrastructure.DAL;
 
 internal static class Extensions
 {
-    private const string SectionName = "postgres";
+    private const string SectionName = "database";
 
     public static IServiceCollection AddPostgres(this IServiceCollection services, IConfiguration configuration)
     {
@@ -14,10 +14,11 @@ internal static class Extensions
         services.Configure<PostgresOptions>(section);
         var options = configuration.GetOptions<PostgresOptions>(SectionName);
 
-        services.AddDbContext<LetsMeetDbContext>(x => x.UseNpgsql(options.ConnectionString));
+        //services.AddDbContext<LetsMeetDbContext>(x => x.UseNpgsql(options.ConnectionString));
+        services.AddDbContext<LetsMeetDbContext>(x => x.UseSqlServer(options.ConnectionString));
         services.AddHostedService<DatabaseInitializer>();
         
-        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         return services;
     }

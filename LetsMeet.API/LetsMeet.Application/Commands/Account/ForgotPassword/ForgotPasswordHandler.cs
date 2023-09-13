@@ -28,8 +28,8 @@ public class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Forg
         
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         
-        var link = "https://localhost:7120/change-password?";
-        var buillink = "Kliknij poniższy link, aby zmienić hasło. " + '\n' + link  + "&Id=" + user.Id + "&token=" + token;
+        var link = "https://localhost:3000/change-password?";
+        var buillink = "Kliknij poniższy link, aby zmienić hasło. " + '\n' + link + "&token=" + token;
 
         var message = new EmailMessageDto(
             new []
@@ -39,9 +39,7 @@ public class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Forg
         await _emailSender.SendEmailAsync(message);
         return new ForgotPasswordDto()
         {
-            Status = true,
             Message = "Link Sent Succesfully",
-            StatusCode = System.Net.HttpStatusCode.OK.ToString(),
             Data = buillink
         };
     }

@@ -1,6 +1,7 @@
 ﻿using System.Net;
 using LetsMeet.Application.Abstractions;
 using LetsMeet.Application.Commands.Room.CreateRoom;
+using LetsMeet.Application.Commands.Room.DeleteRoom;
 using LetsMeet.Application.DTO.Room;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -14,10 +15,12 @@ namespace LetsMeet.Api.Controllers;
 public class RoomsController : ControllerBase
 {
     private readonly ICommandHandler<CreateRoomCommand, CreatedRoomDto> _createRoomHandler;
+    private readonly ICommandHandler<DeleteRoomCommand> _deleteRoomHandler;
 
-    public RoomsController(ICommandHandler<CreateRoomCommand, CreatedRoomDto> createRoomHandler)
+    public RoomsController(ICommandHandler<CreateRoomCommand, CreatedRoomDto> createRoomHandler, ICommandHandler<DeleteRoomCommand> deleteRoomHandler)
     {
         _createRoomHandler = createRoomHandler;
+        _deleteRoomHandler = deleteRoomHandler;
     }
 
     [HttpPost("create")]
@@ -28,5 +31,15 @@ public class RoomsController : ControllerBase
     {
         command.ConnectionId = HttpContext.Connection.Id;
         return await _createRoomHandler.HandleAsync(command);
+    }
+    
+    [HttpDelete("delete")]
+    [SwaggerOperation(Summary = "Delete Room")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> DeleteRoom([FromQuery] DeleteRoomCommand command)
+    {
+        await _deleteRoomHandler.HandleAsync(command);
+        return NoContent();
     }
 }

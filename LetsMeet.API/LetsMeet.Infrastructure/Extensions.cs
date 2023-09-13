@@ -1,4 +1,5 @@
 ﻿using LetsMeet.Application.Abstractions;
+using LetsMeet.Application.Middleware;
 using LetsMeet.Application.Security;
 using LetsMeet.Core.Domain.Entities;
 using LetsMeet.Core.Domain.Repositories;
@@ -33,10 +34,12 @@ public static class Extensions
 
         var emailConfiguration = configuration.GetSection("EmailConfiguration")
             .Get<EmailConfiguration>();
-        services.AddSingleton(emailConfiguration);
+        services.AddScoped<EmailConfiguration>(x=>emailConfiguration);
         
         services.AddAuth(authOptions);
         services.AddSwagger();
+        
+        services.AddSingleton<ExceptionsMiddleware>();
         
         services.AddScoped<UserManager<User>, UserManager<User>>();
         services.AddScoped<IUserRepository, UserRepository>();

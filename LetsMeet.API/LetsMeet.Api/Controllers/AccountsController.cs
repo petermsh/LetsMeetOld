@@ -12,14 +12,14 @@ namespace LetsMeet.Api.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class AccountController : ControllerBase
+public class AccountsController : ControllerBase
 {
     private readonly ICommandHandler<SignUpCommand, UserLoggedDto> _signUpHandler;
     private readonly ICommandHandler<SignInCommand, UserLoggedDto> _signInHandler;
     private readonly ICommandHandler<ForgotPasswordCommand, ForgotPasswordDto> _forgotPasswordHandler;
     private readonly ICommandHandler<ChangePasswordCommand> _changePasswordHandler;
 
-    public AccountController(ICommandHandler<SignUpCommand, UserLoggedDto> signUpHandler, ICommandHandler<SignInCommand, UserLoggedDto> signInHandler, ICommandHandler<ForgotPasswordCommand, ForgotPasswordDto> forgotPasswordHandler, ICommandHandler<ChangePasswordCommand> changePasswordHandler)
+    public AccountsController(ICommandHandler<SignUpCommand, UserLoggedDto> signUpHandler, ICommandHandler<SignInCommand, UserLoggedDto> signInHandler, ICommandHandler<ForgotPasswordCommand, ForgotPasswordDto> forgotPasswordHandler, ICommandHandler<ChangePasswordCommand> changePasswordHandler)
     {
         _signUpHandler = signUpHandler;
         _signInHandler = signInHandler;

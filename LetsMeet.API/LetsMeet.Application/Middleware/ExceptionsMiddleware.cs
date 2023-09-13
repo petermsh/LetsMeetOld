@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace LetsMeet.Application.Middleware;
 
-public class ExceptionsMiddleware
+public class ExceptionsMiddleware : IMiddleware
 {
     private readonly ILogger<ExceptionsMiddleware> _logger;
 

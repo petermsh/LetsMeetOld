@@ -1,6 +1,7 @@
 using System.Text.Json.Serialization;
 using LetsMeet.Application;
 using LetsMeet.Application.Hubs;
+using LetsMeet.Application.Middleware;
 using LetsMeet.Core;
 using LetsMeet.Infrastructure;
 using LetsMeet.Infrastructure.Services.Auth;
@@ -39,11 +40,9 @@ builder.Services.AddSignalR(options =>
 var app = builder.Build();
 app.UseCors("CorsPolicy");
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
-{
-    app.UseSwagger();
-    app.UseSwaggerUI();
-}
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseMiddleware<ExceptionsMiddleware>();
 
 app.MapHub<ChatHub>("/chat");
 app.MapDefaultControllerRoute();

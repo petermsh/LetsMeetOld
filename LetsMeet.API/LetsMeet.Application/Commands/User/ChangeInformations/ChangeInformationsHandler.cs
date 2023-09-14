@@ -25,7 +25,6 @@ public class ChangeInformationsHandler : ICommandHandler<ChangeInformationsComma
 
         user.UserName = command.UserName;
         user.Bio = command.Bio;
-        user.Gender = (Gender)command.Gender;
         user.City = command.City;
         user.University = command.University;
         user.Major = command.Major;

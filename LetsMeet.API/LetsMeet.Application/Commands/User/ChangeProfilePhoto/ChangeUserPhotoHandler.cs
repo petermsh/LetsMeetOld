@@ -30,7 +30,7 @@ public class ChangeUserPhotoHandler : ICommandHandler<ChangeUserPhotoCommand>
         var photoBytes = memoryStream.ToArray();
         
         var base64String = Convert.ToBase64String(photoBytes);
-        //user.Photo = memoryStream.ToArray();
+        user.Photo = base64String;
         await _userRepository.UpdateAsync(user);
     }
 }

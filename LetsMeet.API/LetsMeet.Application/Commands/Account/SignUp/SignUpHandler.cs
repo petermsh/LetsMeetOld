@@ -32,17 +32,8 @@ internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedD
 
         if (command.Password != command.RepeatedPassword)
             throw new WrongRepeatedPasswordException();
-        
-        var user = new Core.Domain.Entities.User()
-        {
-            Email = command.Email,
-            UserName = command.UserName,
-            Gender = (Gender)command.Gender,
-            Bio = command.Bio,
-            City = command.City,
-            University = command.University,
-            Major = command.Major
-        };
+
+        var user = Core.Domain.Entities.User.Create(command.Email, command.UserName, command.Bio, command.City, command.University, command.Major, (Gender)command.Gender);
 
         var registeredUser = await _userManager.CreateAsync(user, command.Password);
         if (!registeredUser.Succeeded)

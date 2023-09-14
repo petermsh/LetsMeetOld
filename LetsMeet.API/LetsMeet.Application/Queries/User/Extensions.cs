@@ -14,6 +14,7 @@ public static class Extensions
             Gender = (Gender)entity.Gender,
             Major = entity.Major,
             University = entity.University,
-            UserName = entity.UserName
+            UserName = entity.UserName,
+            Photo = Convert.FromBase64String(entity.Photo)
         };
 }

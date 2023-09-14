@@ -1,5 +1,6 @@
 ﻿using LetsMeet.Application.Abstractions;
 using LetsMeet.Application.Commands.User.ChangeInformations;
+using LetsMeet.Application.Commands.User.ChangeProfilePhoto;
 using LetsMeet.Application.Queries.User.GetCurrentUser;
 using LetsMeet.Application.Queries.User.GetUserByUserName;
 using Microsoft.AspNetCore.Authorization;
@@ -15,12 +16,14 @@ public class UsersController : ControllerBase
     private readonly IQueryHandler<GetUserByUserNameQuery, UserDetailsDto> _getUserByUserNameHandler;
     private readonly IQueryHandler<GetCurrentUserQuery, UserDetailsDto> _getCurrentUserHandler;
     private readonly ICommandHandler<ChangeInformationsCommand> _changeUserInformationHandler;
+    private readonly ICommandHandler<ChangeUserPhotoCommand> _changeUserPhotoHandler;
 
-    public UsersController(IQueryHandler<GetUserByUserNameQuery, UserDetailsDto> getUserByUserNameHandler, IQueryHandler<GetCurrentUserQuery, UserDetailsDto> getCurrentUserHandler, ICommandHandler<ChangeInformationsCommand> changeUserInformationHandler)
+    public UsersController(IQueryHandler<GetUserByUserNameQuery, UserDetailsDto> getUserByUserNameHandler, IQueryHandler<GetCurrentUserQuery, UserDetailsDto> getCurrentUserHandler, ICommandHandler<ChangeInformationsCommand> changeUserInformationHandler, ICommandHandler<ChangeUserPhotoCommand> changeUserPhotoHandler)
     {
         _getUserByUserNameHandler = getUserByUserNameHandler;
         _getCurrentUserHandler = getCurrentUserHandler;
         _changeUserInformationHandler = changeUserInformationHandler;
+        _changeUserPhotoHandler = changeUserPhotoHandler;
     }
 
     [HttpGet("name")]
@@ -55,6 +58,18 @@ public class UsersController : ControllerBase
     public async Task<ActionResult> ChangeUserInformations([FromBody] ChangeInformationsCommand command)
     {
         await _changeUserInformationHandler.HandleAsync(command);
+        return NoContent();
+    }
+    
+    [HttpPatch("change-user-photo")]
+    [Authorize]
+    [SwaggerOperation(
+        Summary="Change User Photo")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    public async Task<ActionResult> ChangeUserPhoto([FromForm] ChangeUserPhotoCommand command)
+    {
+        await _changeUserPhotoHandler.HandleAsync(command);
         return NoContent();
     }
 }

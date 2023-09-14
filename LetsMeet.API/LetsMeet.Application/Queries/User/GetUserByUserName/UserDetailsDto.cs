@@ -1,4 +1,5 @@
 ﻿using LetsMeet.Core.Domain.Enums;
+using Microsoft.AspNetCore.Http;
 
 namespace LetsMeet.Application.Queries.User.GetUserByUserName;
 
@@ -11,4 +12,5 @@ public class UserDetailsDto
     public string University { get; set; }
     public string Major { get; set; }
     public Gender Gender { get; set; }
+    public byte[] Photo { get; set; }
 }

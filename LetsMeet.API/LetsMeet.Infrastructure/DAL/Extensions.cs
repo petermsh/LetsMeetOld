@@ -15,7 +15,10 @@ internal static class Extensions
         var options = configuration.GetOptions<PostgresOptions>(SectionName);
 
         //services.AddDbContext<LetsMeetDbContext>(x => x.UseNpgsql(options.ConnectionString));
-        services.AddDbContext<LetsMeetDbContext>(x => x.UseSqlServer(options.ConnectionString));
+        services.AddDbContext<LetsMeetDbContext>(x => x.UseSqlServer(options.ConnectionString, sqlServerOptions =>
+        {
+            sqlServerOptions.CommandTimeout(1);
+        }));
         services.AddHostedService<DatabaseInitializer>();
         
         //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);

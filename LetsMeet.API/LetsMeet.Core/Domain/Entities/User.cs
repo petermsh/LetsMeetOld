@@ -23,7 +23,8 @@ public sealed class User : IdentityUser<Guid>, IModifiedAt, ICreatedAt
     public User()
     {
     }
-    public User(string email, string userName, string? bio, string city, string? university, string? major, Gender? gender)
+
+    private User(string email, string userName, string? bio, string city, string? university, string? major, Gender? gender, string photo)
     {
         Email = email;
         UserName = userName;
@@ -33,22 +34,14 @@ public sealed class User : IdentityUser<Guid>, IModifiedAt, ICreatedAt
         Major = major;
         Gender = gender;
         CreatedAt = DateTimeOffset.UtcNow;
-        Photo = AddDefaultPhoto();
+        Photo = photo;
     }
 
-    public static User Create(string email, string userName, string? bio, string city, string? university, string? major, Gender? gender)
-        => new(email, userName, bio, city, university, major, gender);
+    public static User Create(string email, string userName, string? bio, string city, string? university, string? major, Gender? gender, string photo)
+        => new(email, userName, bio, city, university, major, gender, photo);
 
     public void ChangeStatus(bool status) => Status = status;
 
     public void CountMessage() => MessageCount++;
-
-    private static string AddDefaultPhoto()
-    {
-        using var stream = new FileStream("./../profile.png", FileMode.Open);
-        using var memoryStream = new MemoryStream();
-        stream.CopyTo(memoryStream);
-        return Convert.ToBase64String(memoryStream.ToArray());
-    }
 
 }

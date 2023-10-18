@@ -42,7 +42,7 @@ public class ChatHub : Hub
         var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
 
         if (user is null)
-            throw new UserNotFoundException("");
+            throw new UserNotFoundException();
         user.ChangeStatus(true);
     }
 
@@ -60,11 +60,9 @@ public class ChatHub : Hub
     {
         var userName = Context.User.Identity.Name;
         var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);
-        
+
         var command = new SendMessageCommand(createMessageDto.Room, createMessageDto.Content);
         await _sendMessageHandler.HandleAsync(command);
-
-        var room = await _roomRepository.GetAsync(createMessageDto.Room);
 
         var currentUserRooms = await _getRoomsHandler.HandleAsync(new GetRooms(user.Id));
         await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRooms", currentUserRooms);
@@ -128,7 +126,12 @@ public class ChatHub : Hub
 
         await Clients.Client(Context.ConnectionId).SendAsync("ReceiveRooms", rooms);
     }
-    
+
+    public async Task GetConnectionId()
+    {
+        await Clients.Client(Context.ConnectionId).SendAsync("ReceiveMessage", $"User's connectionId: {Context.ConnectionId}");
+    }
+
     // public async Task SendMessage(CreateMessageDto createMessageDto)
     // {
     //     var user = await _dataContext.Users.FirstOrDefaultAsync(u => u.UserName == Context.User.Identity.Name);

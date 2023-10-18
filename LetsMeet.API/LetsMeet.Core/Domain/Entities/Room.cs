@@ -10,6 +10,7 @@ public class Room : ICreatedAt
     public string? RoomName { get; set; }
     public bool IsLocked { get; set; }
     public DateTimeOffset CreatedAt { get; set; }
+    public int EntityStatus { get; set; } = 1;
     
     public ICollection<User> Users { get; set; }
     public ICollection<Message> Messages { get; set; }

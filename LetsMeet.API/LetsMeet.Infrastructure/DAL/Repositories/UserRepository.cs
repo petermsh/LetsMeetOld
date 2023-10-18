@@ -38,6 +38,8 @@ internal sealed class UserRepository : IUserRepository
     }
 
     public async Task<List<User>> GetUsersAsync(Expression<Func<User, bool>> predicate)
-        => await _dbContext.Users.Where(predicate).ToListAsync();
+        => await _dbContext.Users
+            .Include(x=>x.Rooms)
+            .Where(predicate).ToListAsync();
 
 }

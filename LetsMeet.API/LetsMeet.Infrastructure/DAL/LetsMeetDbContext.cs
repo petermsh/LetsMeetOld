@@ -3,6 +3,7 @@ using LetsMeet.Core.Domain.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Diagnostics;
 
 namespace LetsMeet.Infrastructure.DAL;
 
@@ -14,7 +15,7 @@ internal sealed class LetsMeetDbContext : IdentityDbContext<User, IdentityRole<G
     
     public DbSet<Room> Rooms { get; set; }
     public DbSet<Message> Messages { get; set; }
-
+    
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.ApplyConfigurationsFromAssembly(GetType().Assembly);

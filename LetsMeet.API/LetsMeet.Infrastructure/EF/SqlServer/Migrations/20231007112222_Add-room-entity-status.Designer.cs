@@ -4,6 +4,7 @@ using LetsMeet.Infrastructure.DAL;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,10 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace LetsMeet.Infrastructure.EF.SqlServer.Migrations
 {
     [DbContext(typeof(LetsMeetDbContext))]
-    partial class LetsMeetDbContextModelSnapshot : ModelSnapshot
+    [Migration("20231007112222_Add-room-entity-status")]
+    partial class Addroomentitystatus
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

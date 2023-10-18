@@ -22,7 +22,7 @@ public class ChangePasswordHandler : ICommandHandler<ChangePasswordCommand>
 
     public async Task HandleAsync(ChangePasswordCommand command)
     {
-        var user = await _userRepository.GetByUsernameAsync(_userInfoProvider.UserName);
+        var user = await _userRepository.GetByIdAsync(command.Id);
 
         if (user is null)
             throw new UserNotFoundException("");

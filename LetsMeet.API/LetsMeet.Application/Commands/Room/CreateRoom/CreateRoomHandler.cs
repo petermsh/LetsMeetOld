@@ -34,9 +34,9 @@ internal sealed class CreateRoomHandler : ICommandHandler<CreateRoomCommand, Cre
         Random rng = new Random();
         var secondUser = new Core.Domain.Entities.User() {};
         var users = new List<Core.Domain.Entities.User> {} ;
-        int counter = 0;
-        Core.Domain.Entities.Room? existingRoom;
-        
+        int counter = 0; 
+        var existingRoom = new Core.Domain.Entities.Room();
+
         var currentUser = await _userRepository.GetByIdAsync(new Guid(_userInfoProvider.UserId));
         
         if (currentUser is null)
@@ -52,33 +52,35 @@ internal sealed class CreateRoomHandler : ICommandHandler<CreateRoomCommand, Cre
                 x.Id != currentUser.Id && x.Status == true && x.Gender == command.Gender);
         }
 
-        if (command.IsCity)
-            users = users.Where(x => x.City == currentUser.City).ToList();
+        if (command.City != null)
+            users = users.Where(x => x.City == command.City).ToList();
 
-        if (command.IsUniversity)
-            users = users.Where(x => x.University == currentUser.University).ToList();
+        if (command.University != null)
+            users = users.Where(x => x.University == command.University).ToList();
+        
+        if (command.Major != null)
+            users = users.Where(x => x.Major == command.Major).ToList();
 
         users = users.OrderByDescending(x => x.MessageCount)
-            .Take(5)
+            .Take(10)
             .ToList();
         
         if (users.Count == 0)
             throw new UsersNotFoundException();
-        
+
         do
         {
             var randUser = rng.Next(users.Count());
-            var user = users[randUser];
-
-            secondUser = await _userRepository.GetByIdAsync(user.Id);
-            counter++;
+            secondUser = users[randUser];
 
             existingRoom = await _roomRepository.GetRoomWhereUsersAsync(secondUser.Id, currentUser.Id);
+            if (existingRoom == null) continue;
+            users.Remove(secondUser);
+            secondUser = null;
 
-        } while (existingRoom != null
-                 && counter < 10);
+        } while (existingRoom != null && users != null);
 
-        if (counter == 10)
+        if (secondUser is null)
             throw new UsersNotFoundException();
         
         var room = new Core.Domain.Entities.Room
@@ -96,7 +98,6 @@ internal sealed class CreateRoomHandler : ICommandHandler<CreateRoomCommand, Cre
         };
 
         await _messageRepository.AddAsync(message);
-        
         await _hubContext.Groups.AddToGroupAsync(command.ConnectionId, room.RoomId);
         await _hubContext.Clients.Group(room.RoomId).SendAsync("ReceiveMessage", message.Content);
         

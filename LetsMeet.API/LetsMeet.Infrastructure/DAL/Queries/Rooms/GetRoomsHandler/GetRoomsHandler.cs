@@ -24,6 +24,7 @@ internal sealed class GetRoomsHandler : IQueryHandler<GetRooms, List<RoomsDto>>
         
         var rooms = await _dbContext.Rooms
         .Where(r=>r.IsLocked == false)
+        .Where(r=>r.EntityStatus == 1)
         .Where(r=>r.Users.Any(x=>x.Id == user.Id))
         .Select(query=>new RoomsDto
         {

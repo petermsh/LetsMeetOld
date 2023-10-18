@@ -28,8 +28,8 @@ public class ForgotPasswordHandler : ICommandHandler<ForgotPasswordCommand, Forg
         
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
         
-        var link = "https://localhost:3000/change-password?";
-        var buillink = "Kliknij poniższy link, aby zmienić hasło. " + '\n' + link + "&token=" + token;
+        var link = "http://localhost:3000/change-password?";
+        var buillink = "Kliknij poniższy link, aby zmienić hasło. " + '\n' + link  + "&Id=" + user.Id + "&token=" + token;
 
         var message = new EmailMessageDto(
             new []

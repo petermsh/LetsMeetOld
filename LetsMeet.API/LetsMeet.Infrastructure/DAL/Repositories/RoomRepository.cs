@@ -24,7 +24,8 @@ internal class RoomRepository : IRoomRepository
 
     public async Task RemoveAsync(Room room)
     {
-        _rooms.Remove(room);
+        room.EntityStatus = 0;
+        _rooms.Update(room);
         await _dbContext.SaveChangesAsync();
     }
 
@@ -36,12 +37,13 @@ internal class RoomRepository : IRoomRepository
 
     public async Task<Room> GetAsync(string id)
     { 
-        return await _rooms.SingleOrDefaultAsync(x => x.RoomId == id);
+        return await _rooms.SingleOrDefaultAsync(x => x.RoomId == id && x.EntityStatus == 1);
     }
 
     public async Task<Room> GetRoomWhereUsersAsync(Guid secondUserId, Guid currentUserId)
-        => await _rooms.SingleOrDefaultAsync(r => r.Users.Any(u => u.Id == secondUserId)
-                                                  && r.Users.Any(u => u.Id == currentUserId));
+        => await _rooms.FirstOrDefaultAsync(r => r.Users.Any(u => u.Id == secondUserId)
+                                                  && r.Users.Any(u => u.Id == currentUserId)
+                                                  && r.EntityStatus == 1);
 
     public async Task<List<Room>> GetRoomsAsync(Expression<Func<Room, bool>> predicate)
         => await _dbContext.Rooms.Where(predicate).ToListAsync();

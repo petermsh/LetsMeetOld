@@ -33,7 +33,8 @@ internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedD
         if (command.Password != command.RepeatedPassword)
             throw new WrongRepeatedPasswordException();
 
-        var user = Core.Domain.Entities.User.Create(command.Email, command.UserName, command.Bio, command.City, command.University, command.Major, (Gender)command.Gender);
+        var photo = await GetDefaultPhotoAsync();
+        var user = Core.Domain.Entities.User.Create(command.Email, command.UserName, command.Bio, command.City, command.University, command.Major, (Gender)command.Gender, photo);
 
         var registeredUser = await _userManager.CreateAsync(user, command.Password);
         if (!registeredUser.Succeeded)
@@ -57,5 +58,21 @@ internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedD
     private async Task<bool> UserEmailExists(string email)
     {
         return await _userManager.Users.AnyAsync(x => x.Email == email);
+    }
+
+    private static async Task<string> GetDefaultPhotoAsync()
+    {
+        using var client = new HttpClient();
+        var response = await client.GetAsync("https://cdn.discordapp.com/attachments/1040668916445360157/1151528918105477200/Group_6_1.png");
+
+        if (response.IsSuccessStatusCode)
+        {
+            using var stream = await response.Content.ReadAsStreamAsync();
+            using var memoryStream = new MemoryStream();
+            await stream.CopyToAsync(memoryStream);
+            return Convert.ToBase64String(memoryStream.ToArray());
+        }
+        
+        throw new Exception($"Błąd podczas pobierania obrazu: {response.StatusCode}");
     }
 }

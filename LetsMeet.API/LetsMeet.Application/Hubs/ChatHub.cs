@@ -46,7 +46,7 @@ public class ChatHub : Hub
         user.ChangeStatus(true);
     }
 
-    public override async Task OnDisconnectedAsync(Exception exception)
+    public override async Task OnDisconnectedAsync(Exception? exception)
     {
         var userName = Context.User.Identity.Name;
         var user = await _userManager.Users.SingleOrDefaultAsync(x => x.UserName == userName);

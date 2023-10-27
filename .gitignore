@@ -1,5 +1,7 @@
 # Created by https://www.gitignore.io/api/node,bower,webstorm,visualstudio,visualstudiocode,sublimetext,netbeans,sass
 
+appsettings.json
+
 ### Node ###
 # Logs
 logs

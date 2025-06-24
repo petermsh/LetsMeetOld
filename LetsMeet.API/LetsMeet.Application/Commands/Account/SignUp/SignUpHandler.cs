@@ -63,7 +63,7 @@ internal sealed class SignUpHandler : ICommandHandler<SignUpCommand, UserLoggedD
     private static async Task<string> GetDefaultPhotoAsync()
     {
         using var client = new HttpClient();
-        var response = await client.GetAsync("https://cdn.discordapp.com/attachments/1040668916445360157/1151528918105477200/Group_6_1.png");
+        var response = await client.GetAsync("https://imgur.com/a/foLgtXj");
 
         if (response.IsSuccessStatusCode)
         {

@@ -14,14 +14,14 @@ internal static class Extensions
         services.Configure<PostgresOptions>(section);
         var options = configuration.GetOptions<PostgresOptions>(SectionName);
 
-        //services.AddDbContext<LetsMeetDbContext>(x => x.UseNpgsql(options.ConnectionString));
-        services.AddDbContext<LetsMeetDbContext>(x => x.UseSqlServer(options.ConnectionString, sqlServerOptions =>
-        {
-            sqlServerOptions.CommandTimeout(1);
-        }));
+        services.AddDbContext<LetsMeetDbContext>(x => x.UseNpgsql(options.ConnectionString));
+        // services.AddDbContext<LetsMeetDbContext>(x => x.UseSqlServer(options.ConnectionString, sqlServerOptions =>
+        // {
+        //     sqlServerOptions.CommandTimeout(1);
+        // }));
         services.AddHostedService<DatabaseInitializer>();
         
-        //AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
+        AppContext.SetSwitch("Npgsql.EnableLegacyTimestampBehavior", true);
 
         return services;
     }
